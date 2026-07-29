@@ -70,6 +70,17 @@ function kl_db(): PDO
         last_seen_at TEXT NOT NULL
     )');
 
+    // Permanent audit trail of every connect/disconnect, unlike kitchen_locks
+    // which only reflects current state.
+    $pdo->exec('CREATE TABLE IF NOT EXISTS kitchen_connection_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL REFERENCES users(id),
+        kitchen_id INTEGER NOT NULL REFERENCES kitchens(id),
+        connected_at TEXT NOT NULL,
+        disconnected_at TEXT,
+        disconnected_reason TEXT
+    )');
+
     // users.site_id predates "every user can access every site/kitchen" -- no
     // longer used for access control, left in place (unused) to avoid an
     // unnecessary schema change on databases that already have it.

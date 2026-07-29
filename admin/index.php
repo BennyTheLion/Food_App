@@ -48,6 +48,11 @@ kl_context_bar($user);
       <span class="form-card__body"><span class="form-card__title">מטבחים מחוברים</span><span class="form-card__meta"><?= $activeLockCount ?> מחוברים כרגע · ניתוק ידני</span></span>
       <span class="form-card__chevron">‹</span>
     </a>
+    <a class="form-card" href="<?= kl_h(kl_url('admin/connection-log.php')) ?>">
+      <span class="form-card__status done"></span>
+      <span class="form-card__body"><span class="form-card__title">יומן חיבורים</span><span class="form-card__meta">היסטוריית התחברויות עם חותמות זמן</span></span>
+      <span class="form-card__chevron">‹</span>
+    </a>
   </div>
 </main>
 <?php

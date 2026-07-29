@@ -26,7 +26,7 @@ kl_context_bar($user);
   <div class="hero">
     <div class="hero__eyebrow">ניהול מערכת</div>
     <h1>מטבחים מחוברים כרגע</h1>
-    <p>ניתוק משתמש משחרר את המטבח באופן מיידי כדי שמשתמש אחר יוכל להיכנס אליו.</p>
+    <p>ניתוק משתמש משחרר את המטבח באופן מיידי כדי שמשתמש אחר יוכל להיכנס אליו. <a href="<?= kl_h(kl_url('admin/connection-log.php')) ?>">יומן חיבורים מלא ‹</a></p>
   </div>
 
   <div class="card-list">
