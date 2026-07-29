@@ -90,20 +90,20 @@ function kl_is_admin(array $user): bool
     return $user['role'] === 'admin';
 }
 
-/** Sites/kitchens a user may access: their assigned site for regular users, every site for admins. */
+/** Every registered user can access every site -- there's no per-user site assignment anymore. */
 function kl_accessible_sites(array $user): array
 {
     $pdo = kl_db();
-    if (kl_is_admin($user)) {
-        return $pdo->query('SELECT * FROM sites ORDER BY name')->fetchAll(PDO::FETCH_ASSOC);
-    }
-    if (!$user['site_id']) {
-        return [];
-    }
-    $stmt = $pdo->prepare('SELECT * FROM sites WHERE id = :id');
-    $stmt->execute([':id' => $user['site_id']]);
-    $site = $stmt->fetch(PDO::FETCH_ASSOC);
-    return $site ? [$site] : [];
+    return $pdo->query('SELECT * FROM sites ORDER BY name')->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/** Every dining room within a site -- open to any logged-in user. */
+function kl_dining_rooms_for_site(int $siteId): array
+{
+    $pdo = kl_db();
+    $stmt = $pdo->prepare('SELECT * FROM dining_rooms WHERE site_id = :site_id ORDER BY name');
+    $stmt->execute([':site_id' => $siteId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 function kl_current_kitchen_id(): ?int
@@ -118,7 +118,13 @@ function kl_set_current_kitchen(int $kitchenId): void
     $_SESSION['kitchen_id'] = $kitchenId;
 }
 
-/** Verifies the currently selected kitchen (session) belongs to a site the user can access. Returns it, or null if none/invalid. */
+function kl_clear_current_kitchen(): void
+{
+    kl_start_session();
+    unset($_SESSION['kitchen_id']);
+}
+
+/** The currently selected kitchen (session), with its dining room and site names, or null if none/invalid. Any logged-in user may hold any kitchen. */
 function kl_require_kitchen(array $user): ?array
 {
     $kitchenId = kl_current_kitchen_id();
@@ -126,14 +132,14 @@ function kl_require_kitchen(array $user): ?array
         return null;
     }
     $pdo = kl_db();
-    $stmt = $pdo->prepare('SELECT k.*, s.name AS site_name FROM kitchens k JOIN sites s ON s.id = k.site_id WHERE k.id = :id');
+    $stmt = $pdo->prepare(
+        'SELECT k.*, dr.name AS dining_room_name, dr.site_id AS site_id, s.name AS site_name
+         FROM kitchens k
+         JOIN dining_rooms dr ON dr.id = k.dining_room_id
+         JOIN sites s ON s.id = dr.site_id
+         WHERE k.id = :id'
+    );
     $stmt->execute([':id' => $kitchenId]);
     $kitchen = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (!$kitchen) {
-        return null;
-    }
-    if (!kl_is_admin($user) && (int) $kitchen['site_id'] !== (int) $user['site_id']) {
-        return null;
-    }
-    return $kitchen;
+    return $kitchen ?: null;
 }

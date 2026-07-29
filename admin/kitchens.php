@@ -11,18 +11,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $op = $_POST['op'] ?? '';
     if ($op === 'create') {
         $name = trim((string) ($_POST['name'] ?? ''));
-        $siteId = (int) ($_POST['site_id'] ?? 0);
-        if ($name !== '' && $siteId) {
-            $stmt = $pdo->prepare('INSERT INTO kitchens (site_id, name, created_at) VALUES (:site_id, :name, :created_at)');
-            $stmt->execute([':site_id' => $siteId, ':name' => $name, ':created_at' => (new DateTime())->format('Y-m-d H:i:s')]);
+        $roomId = (int) ($_POST['dining_room_id'] ?? 0);
+        if ($name !== '' && $roomId) {
+            $stmt = $pdo->prepare('INSERT INTO kitchens (dining_room_id, name, created_at) VALUES (:room_id, :name, :created_at)');
+            $stmt->execute([':room_id' => $roomId, ':name' => $name, ':created_at' => (new DateTime())->format('Y-m-d H:i:s')]);
         }
     } elseif ($op === 'update') {
         $id = (int) ($_POST['id'] ?? 0);
         $name = trim((string) ($_POST['name'] ?? ''));
-        $siteId = (int) ($_POST['site_id'] ?? 0);
-        if ($id && $name !== '' && $siteId) {
-            $stmt = $pdo->prepare('UPDATE kitchens SET name = :name, site_id = :site_id WHERE id = :id');
-            $stmt->execute([':name' => $name, ':site_id' => $siteId, ':id' => $id]);
+        $roomId = (int) ($_POST['dining_room_id'] ?? 0);
+        if ($id && $name !== '' && $roomId) {
+            $stmt = $pdo->prepare('UPDATE kitchens SET name = :name, dining_room_id = :room_id WHERE id = :id');
+            $stmt->execute([':name' => $name, ':room_id' => $roomId, ':id' => $id]);
         }
     } elseif ($op === 'delete') {
         $id = (int) ($_POST['id'] ?? 0);
@@ -33,9 +33,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-$sites = $pdo->query('SELECT * FROM sites ORDER BY name')->fetchAll(PDO::FETCH_ASSOC);
+$rooms = $pdo->query(
+    'SELECT dr.*, s.name AS site_name FROM dining_rooms dr JOIN sites s ON s.id = dr.site_id ORDER BY s.name, dr.name'
+)->fetchAll(PDO::FETCH_ASSOC);
 $kitchens = $pdo->query(
-    'SELECT k.*, s.name AS site_name FROM kitchens k JOIN sites s ON s.id = k.site_id ORDER BY s.name, k.name'
+    'SELECT k.*, dr.name AS room_name, dr.site_id AS site_id, s.name AS site_name
+     FROM kitchens k
+     JOIN dining_rooms dr ON dr.id = k.dining_room_id
+     JOIN sites s ON s.id = dr.site_id
+     ORDER BY s.name, dr.name, k.name'
 )->fetchAll(PDO::FETCH_ASSOC);
 
 kl_head('מטבחים');
@@ -48,8 +54,8 @@ kl_context_bar($user);
     <h1>מטבחים</h1>
   </div>
 
-  <?php if (!$sites): ?>
-    <div class="empty">יש ליצור אתר קודם ב<a href="<?= kl_h(kl_url('admin/sites.php')) ?>">ניהול אתרים</a>.</div>
+  <?php if (!$rooms): ?>
+    <div class="empty">יש ליצור חדר אוכל קודם ב<a href="<?= kl_h(kl_url('admin/dining-rooms.php')) ?>">ניהול חדרי אוכל</a>.</div>
   <?php else: ?>
     <div class="card-list">
       <?php foreach ($kitchens as $k): ?>
@@ -58,13 +64,16 @@ kl_context_bar($user);
             <input type="hidden" name="op" value="update">
             <input type="hidden" name="id" value="<?= (int) $k['id'] ?>">
             <input type="text" name="name" value="<?= kl_h($k['name']) ?>">
-            <select name="site_id">
-              <?php foreach ($sites as $s): ?>
-                <option value="<?= (int) $s['id'] ?>" <?= (int) $s['id'] === (int) $k['site_id'] ? 'selected' : '' ?>><?= kl_h($s['name']) ?></option>
+            <select name="dining_room_id">
+              <?php foreach ($rooms as $r): ?>
+                <option value="<?= (int) $r['id'] ?>" <?= (int) $r['id'] === (int) $k['dining_room_id'] ? 'selected' : '' ?>>
+                  <?= kl_h($r['site_name']) ?> — <?= kl_h($r['name']) ?>
+                </option>
               <?php endforeach; ?>
             </select>
             <button type="submit" class="btn btn-ghost">שמירה</button>
           </form>
+          <span class="admin-row__meta"><?= kl_h($k['site_name']) ?> · <?= kl_h($k['room_name']) ?></span>
           <form method="post" class="admin-row__actions" onsubmit="return confirm('למחוק את המטבח?');">
             <input type="hidden" name="op" value="delete">
             <input type="hidden" name="id" value="<?= (int) $k['id'] ?>">
@@ -80,11 +89,11 @@ kl_context_bar($user);
     <div class="section-label">הוספת מטבח</div>
     <form method="post" class="admin-add">
       <input type="hidden" name="op" value="create">
-      <input type="text" name="name" placeholder="שם המטבח, לדוגמה: מטבח ראשי (לוין)" required>
-      <select name="site_id" required>
-        <option value="">בחר/י אתר…</option>
-        <?php foreach ($sites as $s): ?>
-          <option value="<?= (int) $s['id'] ?>"><?= kl_h($s['name']) ?></option>
+      <input type="text" name="name" placeholder="שם המטבח" required>
+      <select name="dining_room_id" required>
+        <option value="">בחר/י חדר אוכל…</option>
+        <?php foreach ($rooms as $r): ?>
+          <option value="<?= (int) $r['id'] ?>"><?= kl_h($r['site_name']) ?> — <?= kl_h($r['name']) ?></option>
         <?php endforeach; ?>
       </select>
       <button type="submit" class="btn btn-primary">הוספה</button>

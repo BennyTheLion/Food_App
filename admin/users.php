@@ -16,24 +16,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = trim((string) ($_POST['email'] ?? ''));
         $password = (string) ($_POST['password'] ?? '');
         $role = ($_POST['role'] ?? 'user') === 'admin' ? 'admin' : 'user';
-        $siteId = $role === 'admin' ? null : ((int) ($_POST['site_id'] ?? 0) ?: null);
 
         if ($name === '' || $email === '' || strlen($password) < 8) {
             $error = 'יש למלא שם, אימייל, וסיסמה של 8 תווים לפחות.';
-        } elseif ($role === 'user' && !$siteId) {
-            $error = 'יש לשייך משתמש רגיל לאתר.';
         } else {
             try {
                 $stmt = $pdo->prepare(
-                    'INSERT INTO users (name, email, password_hash, role, site_id, created_at)
-                     VALUES (:name, :email, :password_hash, :role, :site_id, :created_at)'
+                    'INSERT INTO users (name, email, password_hash, role, created_at)
+                     VALUES (:name, :email, :password_hash, :role, :created_at)'
                 );
                 $stmt->execute([
                     ':name' => $name,
                     ':email' => $email,
                     ':password_hash' => password_hash($password, PASSWORD_DEFAULT),
                     ':role' => $role,
-                    ':site_id' => $siteId,
                     ':created_at' => (new DateTime())->format('Y-m-d H:i:s'),
                 ]);
             } catch (PDOException $e) {
@@ -43,9 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($op === 'update') {
         $id = (int) ($_POST['id'] ?? 0);
         $role = ($_POST['role'] ?? 'user') === 'admin' ? 'admin' : 'user';
-        $siteId = $role === 'admin' ? null : ((int) ($_POST['site_id'] ?? 0) ?: null);
-        $stmt = $pdo->prepare('UPDATE users SET role = :role, site_id = :site_id WHERE id = :id');
-        $stmt->execute([':role' => $role, ':site_id' => $siteId, ':id' => $id]);
+        $stmt = $pdo->prepare('UPDATE users SET role = :role WHERE id = :id');
+        $stmt->execute([':role' => $role, ':id' => $id]);
 
         $newPassword = (string) ($_POST['new_password'] ?? '');
         if ($newPassword !== '') {
@@ -72,10 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$sites = $pdo->query('SELECT * FROM sites ORDER BY name')->fetchAll(PDO::FETCH_ASSOC);
-$users = $pdo->query(
-    'SELECT u.*, s.name AS site_name FROM users u LEFT JOIN sites s ON s.id = u.site_id ORDER BY u.role DESC, u.name'
-)->fetchAll(PDO::FETCH_ASSOC);
+$users = $pdo->query('SELECT * FROM users ORDER BY role DESC, name')->fetchAll(PDO::FETCH_ASSOC);
 
 kl_head('משתמשים');
 kl_topbar(kl_url('admin/index.php'), 'לפאנל הניהול');
@@ -85,6 +77,7 @@ kl_context_bar($user);
   <div class="hero">
     <div class="hero__eyebrow">ניהול מערכת</div>
     <h1>משתמשים</h1>
+    <p>לכל משתמש רשום גישה לכל האתרים והמטבחים. מנהלים בלבד יכולים לגשת לפאנל הניהול, וניתן להם לעבוד בכמה מטבחים במקביל.</p>
   </div>
 
   <?php if ($error): ?>
@@ -104,12 +97,6 @@ kl_context_bar($user);
           <select name="role">
             <option value="user" <?= $u['role'] === 'user' ? 'selected' : '' ?>>משתמש</option>
             <option value="admin" <?= $u['role'] === 'admin' ? 'selected' : '' ?>>מנהל</option>
-          </select>
-          <select name="site_id">
-            <option value="">—</option>
-            <?php foreach ($sites as $s): ?>
-              <option value="<?= (int) $s['id'] ?>" <?= (int) $s['id'] === (int) $u['site_id'] ? 'selected' : '' ?>><?= kl_h($s['name']) ?></option>
-            <?php endforeach; ?>
           </select>
           <input type="password" name="new_password" placeholder="סיסמה חדשה (לא חובה)">
           <button type="submit" class="btn btn-ghost">שמירה</button>
@@ -132,12 +119,6 @@ kl_context_bar($user);
     <select name="role">
       <option value="user">משתמש</option>
       <option value="admin">מנהל</option>
-    </select>
-    <select name="site_id">
-      <option value="">אתר (לא נדרש למנהל)</option>
-      <?php foreach ($sites as $s): ?>
-        <option value="<?= (int) $s['id'] ?>"><?= kl_h($s['name']) ?></option>
-      <?php endforeach; ?>
     </select>
     <button type="submit" class="btn btn-primary">הוספה</button>
   </form>

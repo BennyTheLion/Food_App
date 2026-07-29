@@ -2,13 +2,16 @@
 declare(strict_types=1);
 require __DIR__ . '/inc/db.php';
 require __DIR__ . '/inc/auth.php';
+require __DIR__ . '/inc/kitchen_lock.php';
 require __DIR__ . '/inc/layout.php';
 
 $user = kl_require_login();
+kl_release_user_locks((int) $user['id']); // leaving whatever kitchen they were in, if any
+kl_clear_current_kitchen();
 $sites = kl_accessible_sites($user);
 
 if (count($sites) === 1) {
-    header('Location: ' . kl_url('select-kitchen.php') . '?site=' . $sites[0]['id']);
+    header('Location: ' . kl_url('select-dining-room.php') . '?site=' . $sites[0]['id']);
     exit;
 }
 
@@ -24,12 +27,12 @@ kl_context_bar($user);
 
   <?php if (!$sites): ?>
     <div class="empty">
-      טרם שויך אליך אתר. פני/ה למנהל המערכת כדי לשייך אותך לאתר.
+      טרם הוגדרו אתרים במערכת. פני/ה למנהל המערכת.
     </div>
   <?php else: ?>
     <div class="card-list">
       <?php foreach ($sites as $site): ?>
-        <a class="form-card" href="<?= kl_h(kl_url('select-kitchen.php')) ?>?site=<?= (int) $site['id'] ?>">
+        <a class="form-card" href="<?= kl_h(kl_url('select-dining-room.php')) ?>?site=<?= (int) $site['id'] ?>">
           <span class="form-card__body">
             <span class="form-card__title"><?= kl_h($site['name']) ?></span>
           </span>

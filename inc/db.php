@@ -47,13 +47,32 @@ function kl_db(): PDO
         created_at TEXT NOT NULL
     )');
 
-    $pdo->exec('CREATE TABLE IF NOT EXISTS kitchens (
+    $pdo->exec('CREATE TABLE IF NOT EXISTS dining_rooms (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         site_id INTEGER NOT NULL REFERENCES sites(id),
         name TEXT NOT NULL,
         created_at TEXT NOT NULL
     )');
 
+    kl_migrate_legacy_kitchens($pdo);
+
+    $pdo->exec('CREATE TABLE IF NOT EXISTS kitchens (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        dining_room_id INTEGER NOT NULL REFERENCES dining_rooms(id),
+        name TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    )');
+
+    $pdo->exec('CREATE TABLE IF NOT EXISTS kitchen_locks (
+        kitchen_id INTEGER PRIMARY KEY REFERENCES kitchens(id),
+        user_id INTEGER NOT NULL REFERENCES users(id),
+        locked_at TEXT NOT NULL,
+        last_seen_at TEXT NOT NULL
+    )');
+
+    // users.site_id predates "every user can access every site/kitchen" -- no
+    // longer used for access control, left in place (unused) to avoid an
+    // unnecessary schema change on databases that already have it.
     $pdo->exec('CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -190,4 +209,47 @@ function kl_migrate_legacy_submissions(PDO $pdo): void
 
     $pdo->exec('DROP TABLE IF EXISTS submission_values');
     $pdo->exec('DROP TABLE IF EXISTS submissions');
+}
+
+/**
+ * Self-heal: kitchens used to belong directly to a site (site_id). Now they
+ * belong to a dining_room, which belongs to a site. Unlike the submissions
+ * migration, existing kitchens here may be real data someone already
+ * created (not disposable test rows), so this preserves them: add the new
+ * column, create one default dining room per site that had kitchens, and
+ * attach those kitchens to it. Must run after dining_rooms exists and
+ * before the kitchens CREATE TABLE IF NOT EXISTS (which only fires for a
+ * truly fresh install where the table doesn't exist yet).
+ */
+function kl_migrate_legacy_kitchens(PDO $pdo): void
+{
+    $tableExists = $pdo->query(
+        "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='kitchens'"
+    )->fetchColumn();
+    if (!$tableExists) {
+        return;
+    }
+
+    $columns = array_column($pdo->query('PRAGMA table_info(kitchens)')->fetchAll(PDO::FETCH_ASSOC), 'name');
+    if (in_array('dining_room_id', $columns, true)) {
+        return; // already migrated
+    }
+    if (!in_array('site_id', $columns, true)) {
+        return; // unexpected shape, nothing sensible to migrate
+    }
+
+    $pdo->exec('ALTER TABLE kitchens ADD COLUMN dining_room_id INTEGER REFERENCES dining_rooms(id)');
+
+    $siteIds = $pdo->query('SELECT DISTINCT site_id FROM kitchens WHERE site_id IS NOT NULL')->fetchAll(PDO::FETCH_COLUMN);
+    $insertRoom = $pdo->prepare('INSERT INTO dining_rooms (site_id, name, created_at) VALUES (:site_id, :name, :created_at)');
+    $attachKitchens = $pdo->prepare('UPDATE kitchens SET dining_room_id = :room_id WHERE site_id = :site_id AND dining_room_id IS NULL');
+
+    foreach ($siteIds as $siteId) {
+        $insertRoom->execute([
+            ':site_id' => $siteId,
+            ':name' => 'חדר אוכל ראשי',
+            ':created_at' => (new DateTime())->format('Y-m-d H:i:s'),
+        ]);
+        $attachKitchens->execute([':room_id' => $pdo->lastInsertId(), ':site_id' => $siteId]);
+    }
 }

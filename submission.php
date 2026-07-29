@@ -9,18 +9,19 @@ $pdo = kl_db();
 $id = (int) ($_GET['id'] ?? 0);
 
 $stmt = $pdo->prepare(
-    'SELECT s.*, f.name AS form_name, f.category, k.name AS kitchen_name, k.site_id, si.name AS site_name, u.name AS filler_name
+    'SELECT s.*, f.name AS form_name, f.category, k.name AS kitchen_name, dr.name AS dining_room_name, si.name AS site_name, u.name AS filler_name
      FROM submissions s
      JOIN forms f ON f.id = s.form_id
      JOIN kitchens k ON k.id = s.kitchen_id
-     JOIN sites si ON si.id = k.site_id
+     JOIN dining_rooms dr ON dr.id = k.dining_room_id
+     JOIN sites si ON si.id = dr.site_id
      JOIN users u ON u.id = s.filled_by
      WHERE s.id = :id'
 );
 $stmt->execute([':id' => $id]);
 $submission = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$submission || (!kl_is_admin($user) && (int) $submission['site_id'] !== (int) $user['site_id'])) {
+if (!$submission) {
     http_response_code(404);
     kl_head('רישום לא נמצא');
     kl_topbar(kl_url('dashboard.php'), 'ללוח הבקרה');
@@ -110,6 +111,7 @@ kl_context_bar($user);
     <table class="log-table">
       <tbody>
         <tr><th>אתר</th><td><?= kl_h($submission['site_name']) ?></td></tr>
+        <tr><th>חדר אוכל</th><td><?= kl_h($submission['dining_room_name']) ?></td></tr>
         <tr><th>מטבח</th><td><?= kl_h($submission['kitchen_name']) ?></td></tr>
         <tr><th>ממלא</th><td><?= kl_h($submission['filler_name']) ?></td></tr>
         <?php foreach ($rows as $row): ?>

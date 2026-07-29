@@ -24,12 +24,16 @@ kl_context_bar($user);
       <span class="form-card__body"><span class="form-card__title">אתרים</span><span class="form-card__meta">הוספה, עריכה ומחיקה</span></span>
       <span class="form-card__chevron">‹</span>
     </a>
+    <a class="form-card" href="<?= kl_h(kl_url('admin/dining-rooms.php')) ?>">
+      <span class="form-card__body"><span class="form-card__title">חדרי אוכל</span><span class="form-card__meta">שיוך חדרי אוכל לאתרים</span></span>
+      <span class="form-card__chevron">‹</span>
+    </a>
     <a class="form-card" href="<?= kl_h(kl_url('admin/kitchens.php')) ?>">
-      <span class="form-card__body"><span class="form-card__title">מטבחים</span><span class="form-card__meta">שיוך מטבחים לאתרים</span></span>
+      <span class="form-card__body"><span class="form-card__title">מטבחים</span><span class="form-card__meta">שיוך מטבחים לחדרי אוכל</span></span>
       <span class="form-card__chevron">‹</span>
     </a>
     <a class="form-card" href="<?= kl_h(kl_url('admin/users.php')) ?>">
-      <span class="form-card__body"><span class="form-card__title">משתמשים</span><span class="form-card__meta">הרשאות ושיוך לאתר</span></span>
+      <span class="form-card__body"><span class="form-card__title">משתמשים</span><span class="form-card__meta">הרשאות מערכת</span></span>
       <span class="form-card__chevron">‹</span>
     </a>
     <a class="form-card" href="<?= kl_h(kl_url('admin/date-requests.php')) ?>">

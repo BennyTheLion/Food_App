@@ -14,6 +14,7 @@ function kl_export_submission_csv(array $submission, array $rows): void
 
     fputcsv($out, ['טופס', $submission['form_name']]);
     fputcsv($out, ['אתר', $submission['site_name']]);
+    fputcsv($out, ['חדר אוכל', $submission['dining_room_name']]);
     fputcsv($out, ['מטבח', $submission['kitchen_name']]);
     fputcsv($out, ['ממלא', $submission['filler_name']]);
     fputcsv($out, ['מועד', $submission['submitted_at']]);

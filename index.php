@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require __DIR__ . '/inc/db.php';
 require __DIR__ . '/inc/auth.php';
+require __DIR__ . '/inc/kitchen_lock.php';
 require __DIR__ . '/inc/layout.php';
 
 $user = kl_require_login();
@@ -10,6 +11,7 @@ if (!$kitchen) {
     header('Location: ' . kl_url('select-site.php'));
     exit;
 }
+kl_heartbeat_kitchen($user, (int) $kitchen['id']);
 
 $pdo = kl_db();
 

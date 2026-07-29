@@ -25,10 +25,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } elseif ($op === 'delete') {
         $id = (int) ($_POST['id'] ?? 0);
-        $stmt = $pdo->prepare('SELECT COUNT(*) FROM kitchens WHERE site_id = :id');
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM dining_rooms WHERE site_id = :id');
         $stmt->execute([':id' => $id]);
         if ((int) $stmt->fetchColumn() > 0) {
-            $error = 'לא ניתן למחוק אתר שיש בו מטבחים — יש למחוק קודם את המטבחים.';
+            $error = 'לא ניתן למחוק אתר שיש בו חדרי אוכל — יש למחוק קודם את חדרי האוכל.';
         } else {
             $del = $pdo->prepare('DELETE FROM sites WHERE id = :id');
             $del->execute([':id' => $id]);
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $sites = $pdo->query(
-    'SELECT s.*, (SELECT COUNT(*) FROM kitchens k WHERE k.site_id = s.id) AS kitchen_count
+    'SELECT s.*, (SELECT COUNT(*) FROM dining_rooms dr WHERE dr.site_id = s.id) AS room_count
      FROM sites s ORDER BY s.name'
 )->fetchAll(PDO::FETCH_ASSOC);
 
@@ -68,7 +68,7 @@ kl_context_bar($user);
           <input type="text" name="name" value="<?= kl_h($site['name']) ?>">
           <button type="submit" class="btn btn-ghost">שמירה</button>
         </form>
-        <span class="admin-row__meta"><?= (int) $site['kitchen_count'] ?> מטבחים</span>
+        <span class="admin-row__meta"><?= (int) $site['room_count'] ?> חדרי אוכל</span>
         <form method="post" class="admin-row__actions" onsubmit="return confirm('למחוק את האתר?');">
           <input type="hidden" name="op" value="delete">
           <input type="hidden" name="id" value="<?= (int) $site['id'] ?>">

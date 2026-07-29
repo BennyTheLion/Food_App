@@ -26,10 +26,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $requests = $pdo->query(
-    "SELECT r.*, k.name AS kitchen_name, s.name AS site_name, f.name AS form_name, u.name AS requested_by_name
+    "SELECT r.*, k.name AS kitchen_name, dr.name AS room_name, s.name AS site_name, f.name AS form_name, u.name AS requested_by_name
      FROM date_open_requests r
      JOIN kitchens k ON k.id = r.kitchen_id
-     JOIN sites s ON s.id = k.site_id
+     JOIN dining_rooms dr ON dr.id = k.dining_room_id
+     JOIN sites s ON s.id = dr.site_id
      JOIN forms f ON f.id = r.form_id
      JOIN users u ON u.id = r.requested_by
      ORDER BY (r.status = 'pending') DESC, r.created_at DESC"
@@ -55,7 +56,7 @@ $statusClass = ['pending' => 'neutral', 'approved' => 'safe', 'denied' => 'dange
           <strong><?= kl_h($r['requested_by_name']) ?> מבקש/ת <?= kl_h($r['requested_date']) ?></strong>
           <div class="form-card__meta">
             <span class="badge <?= $statusClass[$r['status']] ?>"><?= $statusLabel[$r['status']] ?></span>
-            <?= kl_h($r['form_name']) ?> · <?= kl_h($r['site_name']) ?> — <?= kl_h($r['kitchen_name']) ?>
+            <?= kl_h($r['form_name']) ?> · <?= kl_h($r['site_name']) ?> — <?= kl_h($r['room_name']) ?> — <?= kl_h($r['kitchen_name']) ?>
           </div>
           <div class="form-card__meta"><?= kl_h($r['reason']) ?></div>
         </div>
