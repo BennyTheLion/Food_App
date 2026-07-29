@@ -109,6 +109,18 @@ function kl_db(): PDO
         last_error TEXT
     )');
 
+    // Every watcher run, not just the latest state -- so you can confirm the
+    // cron job itself is actually firing on schedule and see the full history.
+    $pdo->exec('CREATE TABLE IF NOT EXISTS watcher_runs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ran_at TEXT NOT NULL,
+        status TEXT NOT NULL,
+        status_changed INTEGER NOT NULL DEFAULT 0,
+        alert_sent INTEGER NOT NULL DEFAULT 0,
+        error TEXT,
+        duration_ms INTEGER
+    )');
+
     // users.site_id predates "every user can access every site/kitchen" -- no
     // longer used for access control, left in place (unused) to avoid an
     // unnecessary schema change on databases that already have it.

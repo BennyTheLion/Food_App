@@ -36,6 +36,7 @@ if (!$isCli) {
 }
 
 $pdo = kl_db();
+$runStart = microtime(true);
 
 $target = rtrim(KL_SITE_URL, '/') . '/healthcheck.php';
 $ch = curl_init($target);
@@ -83,18 +84,35 @@ $pdo->prepare(
     ':error' => $error,
 ]);
 
+$alertSent = false;
 if ($statusChanged && $previousStatus !== 'unknown') {
     if ($newStatus === 'down') {
-        kl_send_alert_email(
+        $alertSent = kl_send_alert_email(
             '🔴 האתר אינו זמין',
             "האתר בכתובת " . KL_SITE_URL . " אינו מגיב כראוי.\n\nשגיאה: $error\n\nזמן: $now"
         );
     } else {
-        kl_send_alert_email(
+        $alertSent = kl_send_alert_email(
             '🟢 האתר חזר לפעול',
             "האתר בכתובת " . KL_SITE_URL . " חזר לפעול כרגיל.\n\nזמן: $now"
         );
     }
 }
 
-echo "status=$newStatus" . ($error ? " error=\"$error\"" : '') . ($statusChanged ? ' (changed)' : '') . "\n";
+$durationMs = (int) round((microtime(true) - $runStart) * 1000);
+
+$pdo->prepare(
+    'INSERT INTO watcher_runs (ran_at, status, status_changed, alert_sent, error, duration_ms)
+     VALUES (:ran_at, :status, :changed, :alert_sent, :error, :duration_ms)'
+)->execute([
+    ':ran_at' => $now,
+    ':status' => $newStatus,
+    ':changed' => $statusChanged ? 1 : 0,
+    ':alert_sent' => $alertSent ? 1 : 0,
+    ':error' => $error,
+    ':duration_ms' => $durationMs,
+]);
+
+echo "status=$newStatus" . ($error ? " error=\"$error\"" : '')
+    . ($statusChanged ? ' (changed)' : '') . ($alertSent ? ' (alert sent)' : '')
+    . " [{$durationMs}ms]\n";
