@@ -59,7 +59,7 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
   z-index: 20;
   box-shadow: 0 1px 0 rgba(0,0,0,0.15);
 }
-.topbar__row { display: flex; align-items: center; justify-content: space-between; gap: 12px; max-width: 640px; margin: 0 auto; }
+.topbar__row { display: flex; align-items: center; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap; max-width: 640px; margin: 0 auto; }
 .topbar__brand { display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-weight: 800; font-size: 18px; letter-spacing: -0.01em; }
 .topbar__brand .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--brass-500); flex: none; }
 .topbar__back { color: var(--steel-200); text-decoration: none; font-size: 14px; font-weight: 600; }

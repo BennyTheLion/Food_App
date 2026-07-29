@@ -33,7 +33,7 @@ function kl_head(string $title): void
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title><?= kl_h($title) ?> · יומן מטבח</title>
+<title><?= kl_h($title) ?> · מערכת ניהול מטבח</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@500;700;800&family=Assistant:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -48,7 +48,7 @@ function kl_topbar(?string $backHref = null, ?string $backLabel = null): void
     ?>
 <header class="topbar">
   <div class="topbar__row">
-    <a href="<?= kl_h(kl_url('index.php')) ?>" class="topbar__brand"><span class="dot"></span>יומן מטבח</a>
+    <a href="<?= kl_h(kl_url('index.php')) ?>" class="topbar__brand"><span class="dot"></span>מערכת ניהול מטבח</a>
     <?php if ($backHref): ?>
       <a class="topbar__back" href="<?= kl_h($backHref) ?>">‹ <?= kl_h($backLabel ?? 'חזרה') ?></a>
     <?php endif; ?>
