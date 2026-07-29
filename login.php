@@ -28,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    kl_log_activity($user ? (int) $user['id'] : null, 'login_failed', $email);
     $error = 'אימייל או סיסמה שגויים';
 }
 

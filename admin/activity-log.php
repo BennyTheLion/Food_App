@@ -10,6 +10,11 @@ $log = kl_activity_log(200);
 
 $actionLabel = [
     'login' => 'התחברות',
+    'login_failed' => 'ניסיון התחברות נכשל',
+    'logout' => 'התנתקות',
+    'submission_exported' => 'טופס יוצא ל-CSV',
+    'submission_emailed_ok' => 'טופס נשלח למנהל במייל',
+    'submission_emailed_fail' => 'שליחת טופס למנהל נכשלה',
     'site_created' => 'אתר נוצר',
     'site_renamed' => 'אתר עודכן',
     'site_deleted' => 'אתר נמחק',

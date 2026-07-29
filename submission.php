@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require __DIR__ . '/inc/db.php';
 require __DIR__ . '/inc/auth.php';
+require __DIR__ . '/inc/activity_log.php';
 require __DIR__ . '/inc/layout.php';
 
 $user = kl_require_login();
@@ -74,6 +75,7 @@ $rows = kl_build_submission_rows($values, $fieldMeta);
 $action = $_GET['action'] ?? null;
 
 if ($action === 'export') {
+    kl_log_activity((int) $user['id'], 'submission_exported', $submission['form_name'] . ' #' . $id);
     require __DIR__ . '/inc/export.php';
     kl_export_submission_csv($submission, $rows);
     exit;
@@ -83,6 +85,7 @@ $emailStatus = null;
 if ($action === 'send') {
     require __DIR__ . '/inc/mailer.php';
     $emailStatus = kl_send_submission_email($submission, $rows) ? 'ok' : 'fail';
+    kl_log_activity((int) $user['id'], 'submission_emailed_' . $emailStatus, $submission['form_name'] . ' #' . $id);
 }
 
 kl_head($submission['form_name']);
