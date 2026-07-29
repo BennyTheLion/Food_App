@@ -68,9 +68,38 @@
     });
   }
 
+  function setSvgHidden(el, hide) {
+    // SVGElement doesn't reflect the `.hidden` IDL property to the attribute
+    // the way HTMLElement does, so toggle the attribute directly.
+    if (hide) {
+      el.setAttribute('hidden', '');
+    } else {
+      el.removeAttribute('hidden');
+    }
+  }
+
+  function initPasswordToggles() {
+    document.querySelectorAll('.password-toggle').forEach(function (btn) {
+      var input = document.getElementById(btn.dataset.target);
+      var eyeIcon = btn.querySelector('.icon-eye');
+      var eyeOffIcon = btn.querySelector('.icon-eye-off');
+      if (!input) return;
+
+      btn.addEventListener('click', function () {
+        var nowVisible = input.type === 'password';
+        input.type = nowVisible ? 'text' : 'password';
+        btn.setAttribute('aria-pressed', String(nowVisible));
+        btn.setAttribute('aria-label', nowVisible ? 'הסתר סיסמה' : 'הצג סיסמה');
+        if (eyeIcon) setSvgHidden(eyeIcon, nowVisible);
+        if (eyeOffIcon) setSvgHidden(eyeOffIcon, !nowVisible);
+      });
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     initGauges();
     initDynamicRows();
     initDynamicRowsSerialize();
+    initPasswordToggles();
   });
 })();

@@ -235,6 +235,34 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 
 .empty { text-align: center; padding: 48px 16px; color: var(--graphite-600); }
 
+/* ---------- Auth (login) ---------- */
+.auth-shell {
+  min-height: calc(100dvh - 49px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px 48px;
+}
+.auth-card { width: 100%; max-width: 400px; }
+.password-field { position: relative; }
+.password-field input { padding-inline-end: 46px; width: 100%; }
+.password-toggle {
+  position: absolute;
+  inset-inline-end: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--graphite-600);
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+}
+.password-toggle:hover { color: var(--graphite-900); }
+.password-toggle:focus-visible { outline: 3px solid var(--brass-500); outline-offset: 1px; }
+.password-toggle svg[hidden] { display: none; } /* [hidden] on inline <svg> isn't reliably honored by the UA stylesheet */
+
 /* ---------- Success page ---------- */
 .success-card { text-align: center; padding: 48px 20px; }
 .success-check { width: 64px; height: 64px; border-radius: 50%; background: var(--safe-100); color: var(--safe-600); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; font-size: 32px; }
