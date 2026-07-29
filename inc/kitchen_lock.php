@@ -58,3 +58,26 @@ function kl_release_user_locks(int $userId): void
     $stmt = $pdo->prepare('DELETE FROM kitchen_locks WHERE user_id = :user_id');
     $stmt->execute([':user_id' => $userId]);
 }
+
+/** Admin safety valve: force-releases whoever currently holds this specific kitchen (e.g. an abandoned session). */
+function kl_force_release_kitchen(int $kitchenId): void
+{
+    $pdo = kl_db();
+    $stmt = $pdo->prepare('DELETE FROM kitchen_locks WHERE kitchen_id = :kitchen_id');
+    $stmt->execute([':kitchen_id' => $kitchenId]);
+}
+
+/** All kitchens currently held by someone, with who and since when, for the admin panel. */
+function kl_all_active_locks(): array
+{
+    $pdo = kl_db();
+    return $pdo->query(
+        'SELECT l.kitchen_id, l.locked_at, u.name AS user_name, k.name AS kitchen_name, dr.name AS room_name, s.name AS site_name
+         FROM kitchen_locks l
+         JOIN users u ON u.id = l.user_id
+         JOIN kitchens k ON k.id = l.kitchen_id
+         JOIN dining_rooms dr ON dr.id = k.dining_room_id
+         JOIN sites s ON s.id = dr.site_id
+         ORDER BY l.locked_at DESC'
+    )->fetchAll(PDO::FETCH_ASSOC);
+}
