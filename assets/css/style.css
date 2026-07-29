@@ -262,17 +262,17 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
   padding: 28px 24px;
 }
 .password-field { position: relative; }
-.password-field input { padding-inline-end: 46px; width: 100%; }
+.password-field input { padding-inline-end: 54px; width: 100%; }
 .password-toggle {
   position: absolute;
-  inset-inline-end: 6px;
+  inset-inline-end: 2px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
   color: var(--graphite-600);
-  padding: 6px;
+  padding: 12px;
   border-radius: 8px;
   display: flex;
 }
