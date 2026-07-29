@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require __DIR__ . '/../inc/db.php';
 require __DIR__ . '/../inc/auth.php';
+require __DIR__ . '/../inc/activity_log.php';
 require __DIR__ . '/../inc/layout.php';
 
 $user = kl_require_admin();
@@ -20,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':decided_at' => (new DateTime())->format('Y-m-d H:i:s'),
             ':id' => $id,
         ]);
+        kl_log_activity((int) $user['id'], 'date_request_' . $decision, "request #$id");
     }
     header('Location: ' . kl_url('admin/date-requests.php'));
     exit;

@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require __DIR__ . '/inc/db.php';
 require __DIR__ . '/inc/auth.php';
+require __DIR__ . '/inc/activity_log.php';
 require __DIR__ . '/inc/layout.php';
 
 if (kl_current_user()) {
@@ -22,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($user && $user['password_hash'] && password_verify($password, $user['password_hash'])) {
         kl_login($user);
+        kl_log_activity((int) $user['id'], 'login');
         header('Location: ' . kl_url('select-site.php'));
         exit;
     }

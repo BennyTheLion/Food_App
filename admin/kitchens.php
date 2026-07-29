@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require __DIR__ . '/../inc/db.php';
 require __DIR__ . '/../inc/auth.php';
+require __DIR__ . '/../inc/activity_log.php';
 require __DIR__ . '/../inc/layout.php';
 
 $user = kl_require_admin();
@@ -15,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($name !== '' && $roomId) {
             $stmt = $pdo->prepare('INSERT INTO kitchens (dining_room_id, name, created_at) VALUES (:room_id, :name, :created_at)');
             $stmt->execute([':room_id' => $roomId, ':name' => $name, ':created_at' => (new DateTime())->format('Y-m-d H:i:s')]);
+            kl_log_activity((int) $user['id'], 'kitchen_created', $name);
         }
     } elseif ($op === 'update') {
         $id = (int) ($_POST['id'] ?? 0);
@@ -23,11 +25,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($id && $name !== '' && $roomId) {
             $stmt = $pdo->prepare('UPDATE kitchens SET name = :name, dining_room_id = :room_id WHERE id = :id');
             $stmt->execute([':name' => $name, ':room_id' => $roomId, ':id' => $id]);
+            kl_log_activity((int) $user['id'], 'kitchen_updated', $name);
         }
     } elseif ($op === 'delete') {
         $id = (int) ($_POST['id'] ?? 0);
+        $nameStmt = $pdo->prepare('SELECT name FROM kitchens WHERE id = :id');
+        $nameStmt->execute([':id' => $id]);
+        $name = (string) $nameStmt->fetchColumn();
         $stmt = $pdo->prepare('DELETE FROM kitchens WHERE id = :id');
         $stmt->execute([':id' => $id]);
+        kl_log_activity((int) $user['id'], 'kitchen_deleted', $name);
     }
     header('Location: ' . kl_url('admin/kitchens.php'));
     exit;

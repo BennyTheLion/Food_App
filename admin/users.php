@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require __DIR__ . '/../inc/db.php';
 require __DIR__ . '/../inc/auth.php';
+require __DIR__ . '/../inc/activity_log.php';
 require __DIR__ . '/../inc/layout.php';
 
 $user = kl_require_admin();
@@ -32,6 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':role' => $role,
                     ':created_at' => (new DateTime())->format('Y-m-d H:i:s'),
                 ]);
+                kl_log_activity((int) $user['id'], 'user_created', "$name <$email>, role=$role");
             } catch (PDOException $e) {
                 $error = 'כתובת המייל כבר קיימת במערכת.';
             }
@@ -41,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $role = ($_POST['role'] ?? 'user') === 'admin' ? 'admin' : 'user';
         $stmt = $pdo->prepare('UPDATE users SET role = :role WHERE id = :id');
         $stmt->execute([':role' => $role, ':id' => $id]);
+        kl_log_activity((int) $user['id'], 'user_role_updated', "user #$id -> role=$role");
 
         $newPassword = (string) ($_POST['new_password'] ?? '');
         if ($newPassword !== '') {
@@ -49,6 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $pw = $pdo->prepare('UPDATE users SET password_hash = :hash WHERE id = :id');
                 $pw->execute([':hash' => password_hash($newPassword, PASSWORD_DEFAULT), ':id' => $id]);
+                kl_log_activity((int) $user['id'], 'user_password_reset', "user #$id");
             }
         }
     } elseif ($op === 'delete') {
@@ -56,8 +60,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($id === (int) $user['id']) {
             $error = 'לא ניתן למחוק את המשתמש שאיתו את/ה מחובר/ת כרגע.';
         } else {
+            $nameStmt = $pdo->prepare('SELECT name, email FROM users WHERE id = :id');
+            $nameStmt->execute([':id' => $id]);
+            $deleted = $nameStmt->fetch(PDO::FETCH_ASSOC);
             $stmt = $pdo->prepare('DELETE FROM users WHERE id = :id');
             $stmt->execute([':id' => $id]);
+            kl_log_activity((int) $user['id'], 'user_deleted', $deleted ? "{$deleted['name']} <{$deleted['email']}>" : "user #$id");
         }
     }
 

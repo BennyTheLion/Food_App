@@ -53,6 +53,16 @@ kl_context_bar($user);
       <span class="form-card__body"><span class="form-card__title">יומן חיבורים</span><span class="form-card__meta">היסטוריית התחברויות עם חותמות זמן</span></span>
       <span class="form-card__chevron">‹</span>
     </a>
+    <a class="form-card" href="<?= kl_h(kl_url('admin/submissions-log.php')) ?>">
+      <span class="form-card__status done"></span>
+      <span class="form-card__body"><span class="form-card__title">יומן טפסים</span><span class="form-card__meta">כל הטפסים שמולאו, בכל האתרים</span></span>
+      <span class="form-card__chevron">‹</span>
+    </a>
+    <a class="form-card" href="<?= kl_h(kl_url('admin/activity-log.php')) ?>">
+      <span class="form-card__status done"></span>
+      <span class="form-card__body"><span class="form-card__title">יומן פעולות</span><span class="form-card__meta">התחברויות ופעולות ניהול</span></span>
+      <span class="form-card__chevron">‹</span>
+    </a>
   </div>
 </main>
 <?php

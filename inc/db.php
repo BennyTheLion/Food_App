@@ -81,6 +81,18 @@ function kl_db(): PDO
         disconnected_reason TEXT
     )');
 
+    // General action log: logins and every admin CRUD action (sites,
+    // dining rooms, kitchens, users, date-request decisions). Form
+    // submissions already have their own permanent record in `submissions`
+    // (who/where/when); this covers everything else.
+    $pdo->exec('CREATE TABLE IF NOT EXISTS activity_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER REFERENCES users(id),
+        action TEXT NOT NULL,
+        details TEXT,
+        created_at TEXT NOT NULL
+    )');
+
     // users.site_id predates "every user can access every site/kitchen" -- no
     // longer used for access control, left in place (unused) to avoid an
     // unnecessary schema change on databases that already have it.

@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require __DIR__ . '/../inc/db.php';
 require __DIR__ . '/../inc/auth.php';
+require __DIR__ . '/../inc/activity_log.php';
 require __DIR__ . '/../inc/layout.php';
 
 $user = kl_require_admin();
@@ -16,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($name !== '' && $siteId) {
             $stmt = $pdo->prepare('INSERT INTO dining_rooms (site_id, name, created_at) VALUES (:site_id, :name, :created_at)');
             $stmt->execute([':site_id' => $siteId, ':name' => $name, ':created_at' => (new DateTime())->format('Y-m-d H:i:s')]);
+            kl_log_activity((int) $user['id'], 'dining_room_created', $name);
         }
     } elseif ($op === 'update') {
         $id = (int) ($_POST['id'] ?? 0);
@@ -24,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($id && $name !== '' && $siteId) {
             $stmt = $pdo->prepare('UPDATE dining_rooms SET name = :name, site_id = :site_id WHERE id = :id');
             $stmt->execute([':name' => $name, ':site_id' => $siteId, ':id' => $id]);
+            kl_log_activity((int) $user['id'], 'dining_room_updated', $name);
         }
     } elseif ($op === 'delete') {
         $id = (int) ($_POST['id'] ?? 0);
@@ -32,8 +35,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ((int) $stmt->fetchColumn() > 0) {
             $error = 'לא ניתן למחוק חדר אוכל שיש בו מטבחים — יש למחוק קודם את המטבחים.';
         } else {
+            $nameStmt = $pdo->prepare('SELECT name FROM dining_rooms WHERE id = :id');
+            $nameStmt->execute([':id' => $id]);
             $del = $pdo->prepare('DELETE FROM dining_rooms WHERE id = :id');
             $del->execute([':id' => $id]);
+            kl_log_activity((int) $user['id'], 'dining_room_deleted', (string) $nameStmt->fetchColumn());
         }
     }
     if (!$error) {

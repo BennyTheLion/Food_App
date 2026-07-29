@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require __DIR__ . '/../inc/db.php';
 require __DIR__ . '/../inc/auth.php';
+require __DIR__ . '/../inc/activity_log.php';
 require __DIR__ . '/../inc/layout.php';
 
 $user = kl_require_admin();
@@ -15,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($name !== '') {
             $stmt = $pdo->prepare('INSERT INTO sites (name, created_at) VALUES (:name, :created_at)');
             $stmt->execute([':name' => $name, ':created_at' => (new DateTime())->format('Y-m-d H:i:s')]);
+            kl_log_activity((int) $user['id'], 'site_created', $name);
         }
     } elseif ($op === 'rename') {
         $id = (int) ($_POST['id'] ?? 0);
@@ -22,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($id && $name !== '') {
             $stmt = $pdo->prepare('UPDATE sites SET name = :name WHERE id = :id');
             $stmt->execute([':name' => $name, ':id' => $id]);
+            kl_log_activity((int) $user['id'], 'site_renamed', $name);
         }
     } elseif ($op === 'delete') {
         $id = (int) ($_POST['id'] ?? 0);
@@ -30,8 +33,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ((int) $stmt->fetchColumn() > 0) {
             $error = 'לא ניתן למחוק אתר שיש בו חדרי אוכל — יש למחוק קודם את חדרי האוכל.';
         } else {
+            $nameStmt = $pdo->prepare('SELECT name FROM sites WHERE id = :id');
+            $nameStmt->execute([':id' => $id]);
             $del = $pdo->prepare('DELETE FROM sites WHERE id = :id');
             $del->execute([':id' => $id]);
+            kl_log_activity((int) $user['id'], 'site_deleted', (string) $nameStmt->fetchColumn());
         }
     }
     if (!$error) {
