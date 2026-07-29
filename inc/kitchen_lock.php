@@ -5,34 +5,29 @@ declare(strict_types=1);
  * A kitchen can only be actively worked in by one regular user at a time.
  * Admins are exempt entirely -- they never block anyone and are never
  * blocked, and can be in the same kitchen as a regular user or another
- * admin at once. A lock goes stale after KL_LOCK_TIMEOUT_MINUTES of
- * inactivity (no heartbeat), so a closed browser/tab doesn't permanently
- * strand a kitchen as "occupied".
+ * admin at once. A lock is released only by an explicit exit action (or
+ * logout) -- never automatically by a timer, so a user stepping away
+ * mid-task doesn't get silently kicked out or let someone else take over
+ * without them choosing to leave.
  */
-const KL_LOCK_TIMEOUT_MINUTES = 15;
 
-function kl_lock_cutoff(): string
-{
-    return (new DateTime('-' . KL_LOCK_TIMEOUT_MINUTES . ' minutes'))->format('Y-m-d H:i:s');
-}
-
-/** Current holder of an active (non-stale) lock on this kitchen, or null if free. */
+/** Current holder of a lock on this kitchen, or null if free. */
 function kl_active_lock(int $kitchenId): ?array
 {
     $pdo = kl_db();
     $stmt = $pdo->prepare(
         'SELECT l.*, u.name AS user_name FROM kitchen_locks l
          JOIN users u ON u.id = l.user_id
-         WHERE l.kitchen_id = :kitchen_id AND l.last_seen_at >= :cutoff'
+         WHERE l.kitchen_id = :kitchen_id'
     );
-    $stmt->execute([':kitchen_id' => $kitchenId, ':cutoff' => kl_lock_cutoff()]);
+    $stmt->execute([':kitchen_id' => $kitchenId]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     return $row ?: null;
 }
 
 /**
  * Attempts to enter a kitchen. Admins always succeed without taking a lock.
- * A regular user succeeds if the kitchen is free, stale, or already theirs;
+ * A regular user succeeds if the kitchen is free or already theirs;
  * otherwise fails with who currently holds it.
  */
 function kl_try_acquire_kitchen(array $user, int $kitchenId): array
@@ -56,20 +51,7 @@ function kl_try_acquire_kitchen(array $user, int $kitchenId): array
     return ['ok' => true];
 }
 
-/** Keeps a regular user's lock alive while they're actively browsing a kitchen's pages. No-op for admins. */
-function kl_heartbeat_kitchen(array $user, int $kitchenId): void
-{
-    if (kl_is_admin($user)) {
-        return;
-    }
-    $pdo = kl_db();
-    $stmt = $pdo->prepare(
-        'UPDATE kitchen_locks SET last_seen_at = :now WHERE kitchen_id = :kitchen_id AND user_id = :user_id'
-    );
-    $stmt->execute([':now' => (new DateTime())->format('Y-m-d H:i:s'), ':kitchen_id' => $kitchenId, ':user_id' => $user['id']]);
-}
-
-/** Releases every lock held by this user (e.g. on logout or switching to a different kitchen). */
+/** Releases every lock held by this user -- call this on an explicit "exit kitchen" action, switching kitchens, or logout. */
 function kl_release_user_locks(int $userId): void
 {
     $pdo = kl_db();

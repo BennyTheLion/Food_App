@@ -11,7 +11,6 @@ if (!$kitchen) {
     header('Location: ' . kl_url('select-site.php'));
     exit;
 }
-kl_heartbeat_kitchen($user, (int) $kitchen['id']);
 
 $pdo = kl_db();
 

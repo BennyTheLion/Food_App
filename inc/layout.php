@@ -66,7 +66,7 @@ function kl_context_bar(array $user, ?array $kitchen = null): void
     <span>שלום, <?= kl_h($user['name']) ?><?= kl_is_admin($user) ? ' (מנהל)' : '' ?></span>
     <?php if ($kitchen): ?>
       <span>· <?= kl_h($kitchen['site_name']) ?> — <?= kl_h($kitchen['dining_room_name']) ?> — <?= kl_h($kitchen['name']) ?></span>
-      <a href="<?= kl_h(kl_url('select-site.php')) ?>">החלפת מטבח</a>
+      <a href="<?= kl_h(kl_url('select-site.php')) ?>">יציאה מהמטבח</a>
     <?php endif; ?>
     <a href="<?= kl_h(kl_url('logout.php')) ?>" style="margin-inline-start:auto;">התנתקות</a>
   </div>
