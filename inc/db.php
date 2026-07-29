@@ -5,8 +5,8 @@ declare(strict_types=1);
 const KL_DEFAULT_ADMIN_EMAIL = 'admin@kitchenlog.local';
 const KL_DEFAULT_ADMIN_PASSWORD = 'ChangeMe123!';
 
-/** From-address used for "send to admin" emails. */
-const KL_MAIL_FROM = 'no-reply@kitchenlog.local';
+/** From-address used for "send to admin" emails. Must match a domain actually hosted on this Hostinger account. */
+const KL_MAIL_FROM = 'no-reply@darkorange-octopus-158387.hostingersite.com';
 
 function kl_db(): PDO
 {
