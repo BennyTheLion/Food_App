@@ -50,22 +50,22 @@ $statusClass = ['pending' => 'neutral', 'approved' => 'safe', 'denied' => 'dange
 
   <div class="card-list">
     <?php foreach ($requests as $r): ?>
-      <div class="form-card" style="align-items:flex-start; flex-direction:column; gap:8px;">
-        <span class="form-card__body" style="width:100%;">
-          <span class="form-card__title"><?= kl_h($r['requested_by_name']) ?> מבקש/ת <?= kl_h($r['requested_date']) ?></span>
-          <span class="form-card__meta">
+      <div class="request-card request-card--<?= $r['status'] ?>">
+        <div>
+          <strong><?= kl_h($r['requested_by_name']) ?> מבקש/ת <?= kl_h($r['requested_date']) ?></strong>
+          <div class="form-card__meta">
             <span class="badge <?= $statusClass[$r['status']] ?>"><?= $statusLabel[$r['status']] ?></span>
             <?= kl_h($r['form_name']) ?> · <?= kl_h($r['site_name']) ?> — <?= kl_h($r['kitchen_name']) ?>
-          </span>
-          <span class="form-card__meta"><?= kl_h($r['reason']) ?></span>
-        </span>
+          </div>
+          <div class="form-card__meta"><?= kl_h($r['reason']) ?></div>
+        </div>
         <?php if ($r['status'] === 'pending'): ?>
-          <div style="display:flex; gap:8px;">
+          <div class="request-card__actions">
             <form method="post"><input type="hidden" name="id" value="<?= (int) $r['id'] ?>"><input type="hidden" name="decision" value="approved">
-              <button type="submit" class="btn btn-primary" style="padding:8px 16px; min-height:auto;">אישור</button>
+              <button type="submit" class="btn btn-primary">אישור</button>
             </form>
             <form method="post"><input type="hidden" name="id" value="<?= (int) $r['id'] ?>"><input type="hidden" name="decision" value="denied">
-              <button type="submit" class="btn btn-ghost" style="padding:8px 16px; min-height:auto;">דחייה</button>
+              <button type="submit" class="btn btn-ghost">דחייה</button>
             </form>
           </div>
         <?php endif; ?>

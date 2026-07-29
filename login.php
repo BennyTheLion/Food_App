@@ -34,15 +34,13 @@ kl_topbar();
 ?>
 <main class="auth-shell">
   <div class="auth-card">
-    <div class="hero" style="padding-top:0;">
+    <div class="hero hero--flush">
       <div class="hero__eyebrow">בקרת בטיחות מזון</div>
       <h1>התחברות</h1>
     </div>
 
     <?php if ($error): ?>
-      <div class="field" style="background:var(--danger-100); color:var(--danger-600); border-radius:var(--radius-control); padding:12px 14px; font-weight:600;">
-        <?= kl_h($error) ?>
-      </div>
+      <div class="banner banner--danger"><?= kl_h($error) ?></div>
     <?php endif; ?>
 
     <form method="post" novalidate>
@@ -65,11 +63,11 @@ kl_topbar();
           </button>
         </div>
       </div>
-      <button type="submit" class="btn btn-primary" style="width:100%; margin-top:6px;">התחבר/י</button>
+      <button type="submit" class="btn btn-primary btn-block">התחבר/י</button>
     </form>
 
-    <div style="text-align:center; margin-top:8px;">
-      <button type="button" class="btn btn-ghost" disabled title="<?= kl_google_login_enabled() ? '' : 'טרם הוגדר על ידי מנהל המערכת' ?>" style="opacity:0.55; cursor:not-allowed;">
+    <div class="auth-links">
+      <button type="button" class="btn btn-ghost" disabled title="<?= kl_google_login_enabled() ? '' : 'טרם הוגדר על ידי מנהל המערכת' ?>">
         התחברות עם Google
       </button>
     </div>

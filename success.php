@@ -18,10 +18,10 @@ kl_topbar(kl_url('index.php'), 'לרשימת הטפסים');
   <div class="success-card">
     <div class="success-check">✓</div>
     <h1>הרישום נשמר</h1>
-    <p style="color:var(--graphite-600); margin-top:8px;">
+    <p>
       <?= $form ? kl_h($form['name']) . ' נשמר בהצלחה.' : 'הטופס נשמר בהצלחה.' ?>
     </p>
-    <div style="margin-top:28px; display:flex; flex-direction:column; gap:10px; align-items:center;">
+    <div class="success-card__actions">
       <?php if ($form): ?>
         <a class="btn btn-primary" href="<?= kl_h(kl_url('form.php')) ?>?id=<?= (int) $form['id'] ?>">מילוי נוסף של אותו טופס</a>
       <?php endif; ?>

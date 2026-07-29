@@ -136,7 +136,10 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 .btn-primary { background: var(--brass-500); color: #fff; }
 .btn-primary:active { background: var(--brass-600); }
 .btn-primary:disabled { background: var(--steel-300); cursor: not-allowed; }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.btn-block { width: 100%; }
 .btn-ghost { background: transparent; color: var(--graphite-600); border: 1px solid var(--steel-200); }
+.btn-ghost--danger { color: var(--danger-600); border-color: var(--danger-100); }
 
 /* ---------- Field group ---------- */
 .field { margin-bottom: 22px; }
@@ -229,6 +232,11 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 
 /* ---------- Home hero / empty states ---------- */
 .hero { padding: 22px 0 6px; }
+.hero--flush { padding-top: 0; }
+.auth-links { text-align: center; margin-top: 8px; }
+.mono { font-family: var(--font-mono); }
+.status-note { margin-bottom: 14px; }
+.action-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
 .hero__eyebrow { font-family: var(--font-mono); font-size: 12px; color: var(--brass-600); text-transform: uppercase; letter-spacing: 0.08em; }
 .hero h1 { font-size: 26px; font-weight: 800; margin-top: 6px; line-height: 1.25; }
 .hero p { color: var(--graphite-600); margin-top: 6px; font-size: 14.5px; }
@@ -263,9 +271,51 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 .password-toggle:focus-visible { outline: 3px solid var(--brass-500); outline-offset: 1px; }
 .password-toggle svg[hidden] { display: none; } /* [hidden] on inline <svg> isn't reliably honored by the UA stylesheet */
 
+/* ---------- Banners (errors / confirmations) ---------- */
+.banner { border-radius: var(--radius-control); padding: 12px 14px; font-weight: 600; font-size: 14px; margin-bottom: 16px; }
+.banner--danger { background: var(--danger-100); color: var(--danger-600); }
+.banner--safe { background: var(--safe-100); color: var(--safe-600); }
+
+/* ---------- Admin CRUD rows ---------- */
+.admin-row {
+  background: #fff; border: 1px solid var(--steel-200); border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card); padding: 12px 16px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.admin-row__fields { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; flex: 1; min-width: 0; }
+.admin-row__fields input, .admin-row__fields select {
+  border: 1px solid var(--steel-300); border-radius: 8px; padding: 8px 10px; min-height: 38px; font-size: 14px;
+}
+.admin-row__meta { font-size: 13px; color: var(--graphite-600); white-space: nowrap; }
+.admin-row__actions { display: flex; gap: 8px; flex: none; margin-inline-start: auto; }
+.admin-row .btn { padding: 8px 14px; min-height: 38px; font-size: 14px; }
+
+.admin-add {
+  background: #fff; border: 1.5px dashed var(--steel-300); border-radius: var(--radius-card);
+  padding: 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+}
+.admin-add input, .admin-add select {
+  border: 1px solid var(--steel-300); border-radius: var(--radius-control); padding: 12px 14px; min-height: 48px; font-size: 15px;
+}
+.admin-add input[type=text], .admin-add input[type=email], .admin-add input[type=password] { flex: 1; min-width: 160px; }
+
+/* ---------- Request cards (date-open requests) ---------- */
+.request-card {
+  background: #fff; border: 1px solid var(--steel-200); border-inline-start: 4px solid var(--steel-300);
+  border-radius: var(--radius-card); box-shadow: var(--shadow-card); padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.request-card--pending { border-inline-start-color: var(--brass-500); }
+.request-card--approved { border-inline-start-color: var(--safe-600); }
+.request-card--denied { border-inline-start-color: var(--danger-600); }
+.request-card__actions { display: flex; gap: 8px; }
+.request-card__actions .btn { padding: 8px 16px; min-height: auto; }
+
 /* ---------- Success page ---------- */
 .success-card { text-align: center; padding: 48px 20px; }
 .success-check { width: 64px; height: 64px; border-radius: 50%; background: var(--safe-100); color: var(--safe-600); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; font-size: 32px; }
+.success-card p { color: var(--graphite-600); margin-top: 8px; }
+.success-card__actions { margin-top: 28px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
 
 /* ---------- Dashboard stat tiles ---------- */
 .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0; }

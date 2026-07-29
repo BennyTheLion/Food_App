@@ -56,45 +56,35 @@ kl_context_bar($user);
   </div>
 
   <?php if ($error): ?>
-    <div class="field" style="background:var(--danger-100); color:var(--danger-600); border-radius:var(--radius-control); padding:12px 14px; font-weight:600;"><?= kl_h($error) ?></div>
+    <div class="banner banner--danger"><?= kl_h($error) ?></div>
   <?php endif; ?>
 
-  <div class="table-scroll">
-    <table class="log-table">
-      <thead><tr><th>שם האתר</th><th>מטבחים</th><th></th></tr></thead>
-      <tbody>
-        <?php foreach ($sites as $site): ?>
-          <tr>
-            <td>
-              <form method="post" style="display:flex; gap:8px; align-items:center;">
-                <input type="hidden" name="op" value="rename">
-                <input type="hidden" name="id" value="<?= (int) $site['id'] ?>">
-                <input type="text" name="name" value="<?= kl_h($site['name']) ?>" style="border:1px solid var(--steel-300); border-radius:8px; padding:6px 10px;">
-                <button type="submit" class="btn btn-ghost" style="padding:6px 12px; min-height:auto;">שמירה</button>
-              </form>
-            </td>
-            <td><?= (int) $site['kitchen_count'] ?></td>
-            <td>
-              <form method="post" onsubmit="return confirm('למחוק את האתר?');">
-                <input type="hidden" name="op" value="delete">
-                <input type="hidden" name="id" value="<?= (int) $site['id'] ?>">
-                <button type="submit" class="row-item__remove">×</button>
-              </form>
-            </td>
-          </tr>
-        <?php endforeach; ?>
-        <?php if (!$sites): ?>
-          <tr><td colspan="3"><div class="empty">אין אתרים עדיין</div></td></tr>
-        <?php endif; ?>
-      </tbody>
-    </table>
+  <div class="card-list">
+    <?php foreach ($sites as $site): ?>
+      <div class="admin-row">
+        <form method="post" class="admin-row__fields">
+          <input type="hidden" name="op" value="rename">
+          <input type="hidden" name="id" value="<?= (int) $site['id'] ?>">
+          <input type="text" name="name" value="<?= kl_h($site['name']) ?>">
+          <button type="submit" class="btn btn-ghost">שמירה</button>
+        </form>
+        <span class="admin-row__meta"><?= (int) $site['kitchen_count'] ?> מטבחים</span>
+        <form method="post" class="admin-row__actions" onsubmit="return confirm('למחוק את האתר?');">
+          <input type="hidden" name="op" value="delete">
+          <input type="hidden" name="id" value="<?= (int) $site['id'] ?>">
+          <button type="submit" class="row-item__remove">×</button>
+        </form>
+      </div>
+    <?php endforeach; ?>
+    <?php if (!$sites): ?>
+      <div class="empty">אין אתרים עדיין</div>
+    <?php endif; ?>
   </div>
 
   <div class="section-label">הוספת אתר</div>
-  <form method="post" style="display:flex; gap:10px; flex-wrap:wrap;">
+  <form method="post" class="admin-add">
     <input type="hidden" name="op" value="create">
-    <input type="text" name="name" placeholder="שם האתר, לדוגמה: מגדל העמק" required
-           style="flex:1; min-width:200px; border:1px solid var(--steel-300); border-radius:var(--radius-control); padding:12px 14px;">
+    <input type="text" name="name" placeholder="שם האתר, לדוגמה: מגדל העמק" required>
     <button type="submit" class="btn btn-primary">הוספה</button>
   </form>
 </main>

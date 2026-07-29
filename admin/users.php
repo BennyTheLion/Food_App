@@ -88,60 +88,52 @@ kl_context_bar($user);
   </div>
 
   <?php if ($error): ?>
-    <div class="field" style="background:var(--danger-100); color:var(--danger-600); border-radius:var(--radius-control); padding:12px 14px; font-weight:600;"><?= kl_h($error) ?></div>
+    <div class="banner banner--danger"><?= kl_h($error) ?></div>
   <?php endif; ?>
 
-  <div class="table-scroll">
-    <table class="log-table">
-      <thead><tr><th>שם</th><th>אימייל</th><th>הרשאה / אתר</th><th>סיסמה חדשה</th><th></th></tr></thead>
-      <tbody>
-        <?php foreach ($users as $u): ?>
-          <tr>
-            <td><?= kl_h($u['name']) ?></td>
-            <td class="mono"><?= kl_h($u['email']) ?></td>
-            <td>
-              <form method="post" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                <input type="hidden" name="op" value="update">
-                <input type="hidden" name="id" value="<?= (int) $u['id'] ?>">
-                <select name="role" class="js-role-select" style="border:1px solid var(--steel-300); border-radius:8px; padding:6px 10px;">
-                  <option value="user" <?= $u['role'] === 'user' ? 'selected' : '' ?>>משתמש</option>
-                  <option value="admin" <?= $u['role'] === 'admin' ? 'selected' : '' ?>>מנהל</option>
-                </select>
-                <select name="site_id" style="border:1px solid var(--steel-300); border-radius:8px; padding:6px 10px;">
-                  <option value="">—</option>
-                  <?php foreach ($sites as $s): ?>
-                    <option value="<?= (int) $s['id'] ?>" <?= (int) $s['id'] === (int) $u['site_id'] ? 'selected' : '' ?>><?= kl_h($s['name']) ?></option>
-                  <?php endforeach; ?>
-                </select>
-                <input type="password" name="new_password" placeholder="השאר ריק אם אין שינוי" style="border:1px solid var(--steel-300); border-radius:8px; padding:6px 10px; width:170px;">
-                <button type="submit" class="btn btn-ghost" style="padding:6px 12px; min-height:auto;">שמירה</button>
-              </form>
-            </td>
-            <td></td>
-            <td>
-              <form method="post" onsubmit="return confirm('למחוק את המשתמש?');">
-                <input type="hidden" name="op" value="delete">
-                <input type="hidden" name="id" value="<?= (int) $u['id'] ?>">
-                <button type="submit" class="row-item__remove">×</button>
-              </form>
-            </td>
-          </tr>
-        <?php endforeach; ?>
-      </tbody>
-    </table>
+  <div class="card-list">
+    <?php foreach ($users as $u): ?>
+      <div class="admin-row" style="flex-direction:column; align-items:stretch;">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px;">
+          <strong><?= kl_h($u['name']) ?></strong>
+          <span class="admin-row__meta mono" style="font-family:var(--font-mono);"><?= kl_h($u['email']) ?></span>
+        </div>
+        <form method="post" class="admin-row__fields">
+          <input type="hidden" name="op" value="update">
+          <input type="hidden" name="id" value="<?= (int) $u['id'] ?>">
+          <select name="role">
+            <option value="user" <?= $u['role'] === 'user' ? 'selected' : '' ?>>משתמש</option>
+            <option value="admin" <?= $u['role'] === 'admin' ? 'selected' : '' ?>>מנהל</option>
+          </select>
+          <select name="site_id">
+            <option value="">—</option>
+            <?php foreach ($sites as $s): ?>
+              <option value="<?= (int) $s['id'] ?>" <?= (int) $s['id'] === (int) $u['site_id'] ? 'selected' : '' ?>><?= kl_h($s['name']) ?></option>
+            <?php endforeach; ?>
+          </select>
+          <input type="password" name="new_password" placeholder="סיסמה חדשה (לא חובה)">
+          <button type="submit" class="btn btn-ghost">שמירה</button>
+        </form>
+        <form method="post" onsubmit="return confirm('למחוק את המשתמש?');" style="align-self:flex-end;">
+          <input type="hidden" name="op" value="delete">
+          <input type="hidden" name="id" value="<?= (int) $u['id'] ?>">
+          <button type="submit" class="btn btn-ghost btn-ghost--danger">מחיקת משתמש</button>
+        </form>
+      </div>
+    <?php endforeach; ?>
   </div>
 
   <div class="section-label">הוספת משתמש</div>
-  <form method="post" style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-start;">
+  <form method="post" class="admin-add">
     <input type="hidden" name="op" value="create">
-    <input type="text" name="name" placeholder="שם מלא" required style="border:1px solid var(--steel-300); border-radius:var(--radius-control); padding:12px 14px;">
-    <input type="email" name="email" placeholder="אימייל" required style="border:1px solid var(--steel-300); border-radius:var(--radius-control); padding:12px 14px;">
-    <input type="password" name="password" placeholder="סיסמה (8+ תווים)" required style="border:1px solid var(--steel-300); border-radius:var(--radius-control); padding:12px 14px;">
-    <select name="role" style="border:1px solid var(--steel-300); border-radius:var(--radius-control); padding:12px 14px;">
+    <input type="text" name="name" placeholder="שם מלא" required>
+    <input type="email" name="email" placeholder="אימייל" required>
+    <input type="password" name="password" placeholder="סיסמה (8+ תווים)" required>
+    <select name="role">
       <option value="user">משתמש</option>
       <option value="admin">מנהל</option>
     </select>
-    <select name="site_id" style="border:1px solid var(--steel-300); border-radius:var(--radius-control); padding:12px 14px;">
+    <select name="site_id">
       <option value="">אתר (לא נדרש למנהל)</option>
       <?php foreach ($sites as $s): ?>
         <option value="<?= (int) $s['id'] ?>"><?= kl_h($s['name']) ?></option>

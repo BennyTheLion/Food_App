@@ -51,48 +51,37 @@ kl_context_bar($user);
   <?php if (!$sites): ?>
     <div class="empty">יש ליצור אתר קודם ב<a href="<?= kl_h(kl_url('admin/sites.php')) ?>">ניהול אתרים</a>.</div>
   <?php else: ?>
-    <div class="table-scroll">
-      <table class="log-table">
-        <thead><tr><th>שם המטבח</th><th>אתר</th><th></th></tr></thead>
-        <tbody>
-          <?php foreach ($kitchens as $k): ?>
-            <tr>
-              <td>
-                <form method="post" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                  <input type="hidden" name="op" value="update">
-                  <input type="hidden" name="id" value="<?= (int) $k['id'] ?>">
-                  <input type="text" name="name" value="<?= kl_h($k['name']) ?>" style="border:1px solid var(--steel-300); border-radius:8px; padding:6px 10px;">
-                  <select name="site_id" style="border:1px solid var(--steel-300); border-radius:8px; padding:6px 10px;">
-                    <?php foreach ($sites as $s): ?>
-                      <option value="<?= (int) $s['id'] ?>" <?= (int) $s['id'] === (int) $k['site_id'] ? 'selected' : '' ?>><?= kl_h($s['name']) ?></option>
-                    <?php endforeach; ?>
-                  </select>
-                  <button type="submit" class="btn btn-ghost" style="padding:6px 12px; min-height:auto;">שמירה</button>
-                </form>
-              </td>
-              <td><?= kl_h($k['site_name']) ?></td>
-              <td>
-                <form method="post" onsubmit="return confirm('למחוק את המטבח?');">
-                  <input type="hidden" name="op" value="delete">
-                  <input type="hidden" name="id" value="<?= (int) $k['id'] ?>">
-                  <button type="submit" class="row-item__remove">×</button>
-                </form>
-              </td>
-            </tr>
-          <?php endforeach; ?>
-          <?php if (!$kitchens): ?>
-            <tr><td colspan="3"><div class="empty">אין מטבחים עדיין</div></td></tr>
-          <?php endif; ?>
-        </tbody>
-      </table>
+    <div class="card-list">
+      <?php foreach ($kitchens as $k): ?>
+        <div class="admin-row">
+          <form method="post" class="admin-row__fields">
+            <input type="hidden" name="op" value="update">
+            <input type="hidden" name="id" value="<?= (int) $k['id'] ?>">
+            <input type="text" name="name" value="<?= kl_h($k['name']) ?>">
+            <select name="site_id">
+              <?php foreach ($sites as $s): ?>
+                <option value="<?= (int) $s['id'] ?>" <?= (int) $s['id'] === (int) $k['site_id'] ? 'selected' : '' ?>><?= kl_h($s['name']) ?></option>
+              <?php endforeach; ?>
+            </select>
+            <button type="submit" class="btn btn-ghost">שמירה</button>
+          </form>
+          <form method="post" class="admin-row__actions" onsubmit="return confirm('למחוק את המטבח?');">
+            <input type="hidden" name="op" value="delete">
+            <input type="hidden" name="id" value="<?= (int) $k['id'] ?>">
+            <button type="submit" class="row-item__remove">×</button>
+          </form>
+        </div>
+      <?php endforeach; ?>
+      <?php if (!$kitchens): ?>
+        <div class="empty">אין מטבחים עדיין</div>
+      <?php endif; ?>
     </div>
 
     <div class="section-label">הוספת מטבח</div>
-    <form method="post" style="display:flex; gap:10px; flex-wrap:wrap;">
+    <form method="post" class="admin-add">
       <input type="hidden" name="op" value="create">
-      <input type="text" name="name" placeholder="שם המטבח, לדוגמה: מטבח ראשי (לוין)" required
-             style="flex:1; min-width:200px; border:1px solid var(--steel-300); border-radius:var(--radius-control); padding:12px 14px;">
-      <select name="site_id" required style="border:1px solid var(--steel-300); border-radius:var(--radius-control); padding:12px 14px;">
+      <input type="text" name="name" placeholder="שם המטבח, לדוגמה: מטבח ראשי (לוין)" required>
+      <select name="site_id" required>
         <option value="">בחר/י אתר…</option>
         <?php foreach ($sites as $s): ?>
           <option value="<?= (int) $s['id'] ?>"><?= kl_h($s['name']) ?></option>

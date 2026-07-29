@@ -92,16 +92,16 @@ kl_context_bar($user);
   <div class="hero">
     <div class="hero__eyebrow"><?= kl_h($submission['category']) ?></div>
     <h1><?= kl_h($submission['form_name']) ?></h1>
-    <p class="mono" style="font-family:var(--font-mono);"><?= kl_h($submission['submitted_at']) ?></p>
+    <p class="mono"><?= kl_h($submission['submitted_at']) ?></p>
   </div>
 
   <?php if ($emailStatus === 'ok'): ?>
-    <p class="badge safe" style="margin-bottom:14px;">נשלח בהצלחה למנהל</p>
+    <p class="badge safe status-note">נשלח בהצלחה למנהל</p>
   <?php elseif ($emailStatus === 'fail'): ?>
-    <p class="badge danger" style="margin-bottom:14px;">שליחת המייל נכשלה — ודא/י שהוגדר מנהל עם כתובת מייל</p>
+    <p class="badge danger status-note">שליחת המייל נכשלה — ודא/י שהוגדר מנהל עם כתובת מייל</p>
   <?php endif; ?>
 
-  <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px;">
+  <div class="action-row">
     <a class="btn btn-ghost" href="?id=<?= $id ?>&action=export">ייצוא ל-CSV</a>
     <a class="btn btn-ghost" href="?id=<?= $id ?>&action=send">שליחה למנהל במייל</a>
   </div>
