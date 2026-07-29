@@ -151,6 +151,7 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 }
 .field__label .req { color: var(--danger-600); margin-inline-start: 3px; }
 .field input[type=text], .field input[type=number], .field input[type=date], .field input[type=time],
+.field input[type=email], .field input[type=password],
 .field select, .field textarea {
   width: 100%;
   border: 1px solid var(--steel-300);
@@ -251,7 +252,15 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
   justify-content: center;
   padding: 24px 16px 48px;
 }
-.auth-card { width: 100%; max-width: 400px; }
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  background: #fff;
+  border: 1px solid var(--steel-200);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 28px 24px;
+}
 .password-field { position: relative; }
 .password-field input { padding-inline-end: 46px; width: 100%; }
 .password-toggle {
