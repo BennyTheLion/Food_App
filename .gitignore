@@ -1,0 +1,6 @@
+# Generated at runtime by inc/db.php — always re-seeded from data/forms-data.json
+data/kitchen_log.sqlite
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db

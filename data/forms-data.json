@@ -1,0 +1,994 @@
+{
+  "forms": [
+    {
+      "id": 1,
+      "name": "בדיקת ריכוז חומר חיטוי",
+      "description": "בדיקת ריכוז חומר חיטוי פעמיים ביום. ריכוז רצוי: 80-100 ppm. R-100-04",
+      "category": "חיטוי וניקיון",
+      "active": false
+    },
+    {
+      "id": 2,
+      "name": "רישום פעולת מקרר מהיר",
+      "description": "תיעוד כניסה ויציאה של מוצרים ממקרר מהיר. R-100-03",
+      "category": "אחסון וקירור"
+    },
+    {
+      "id": 3,
+      "name": "רישום קבלת חומרי גלם",
+      "description": "רישום קבלת מוצרים מהספק - בדיקה ויזואלית, טמפרטורה, תאריך תפוגה",
+      "category": "קבלת סחורה"
+    },
+    {
+      "id": 4,
+      "name": "קבלה והגשת מזון בתחנות",
+      "description": "רישום מנה בודדת - בדיקת טמפרטורות קבלה, הוצאה מתנור והגשה + בדיקה אורגנולפטית. R-100-01",
+      "category": "קבלה והגשה"
+    },
+    {
+      "id": 5,
+      "name": "טופס ביצוע הדרכה",
+      "description": "תיעוד הדרכת בטיחות מזון - פרטי ההדרכה ורשימת משתתפים. R-100-22",
+      "category": "הדרכה"
+    },
+    {
+      "id": 6,
+      "name": "בדיקת טמפרטורה יומית — מקררים ומקפיאים",
+      "description": "מעקב טמפרטורה בתחילת וסיום יום עבודה לכל מקרר/מקפיא. מקרר: 0 עד 5°C, מקפיא: −25 עד −18°C.",
+      "category": "אחסון וקירור"
+    },
+    {
+      "id": 7,
+      "name": "מדידת טמפרטורה בזמן הגשה",
+      "description": "בדיקת טמפרטורת הגשה לכל מנה. מזון חם: הגשה ≥70°C, מזון קר/סלטים: הגשה ≤5°C.",
+      "category": "הגשה ואיכות"
+    },
+    {
+      "id": 8,
+      "name": "מדידת טמפרטורה יציאה מהתנור",
+      "description": "בדיקת טמפרטורת יציאה מהתנור למנות חמות בלבד. סף מינימלי: 70°C.",
+      "category": "הגשה ואיכות"
+    },
+    {
+      "id": 9,
+      "name": "בדיקת עובדים לפני תחילת עבודה",
+      "description": "בדיקת מראה והיגיינה אישית לכל עובד לפני כניסה למשמרת: ציפורניים, גילוח, ליבוש, כיסוי ראש ותכשיטים.",
+      "category": "היגיינה ובטיחות"
+    },
+    {
+      "id": 10,
+      "name": "חיטוי ירקות ופירות",
+      "description": "רישום חיטוי ירקות ופירות לפני הכנה",
+      "category": "חיטוי וניקיון"
+    },
+    {
+      "id": 11,
+      "name": "טופס טמפ' גמר בישול",
+      "description": "טמפ' יציאה מבישול לפחות 75°C — בדיקה במרכז המוצר. יש לחטא מד טמפ' לפני ואחרי הבדיקה. R-100-17",
+      "category": "הגשה ואיכות"
+    },
+    {
+      "id": 12,
+      "name": "מעקב החלפת שמן לטיגון",
+      "description": "סינון/החלפת שמן כשהשמן קר. סינון בסוף כל יום; החלפה אחרי טיגון דגים/חצילים, בהופעת קצף/עשן או TPM מעל 27%. אין להשליך שמן לביוב. R-100-06",
+      "category": "הגשה ואיכות"
+    },
+    {
+      "id": 13,
+      "name": "מעקב הפשרה בשר / עוף / דגים",
+      "description": "רישום הכנסה והוצאה מהפשרה — טמפרטורה בסיום הפשרה עד 5°C תקינה. מעל 5°C — חריגה.",
+      "category": "הפשרה"
+    }
+  ],
+  "fields": [
+    {
+      "formId": 1,
+      "fieldKey": "date",
+      "label": "תאריך",
+      "fieldType": "date",
+      "required": true,
+      "orderIndex": 0,
+      "options": null
+    },
+    {
+      "formId": 1,
+      "fieldKey": "time",
+      "label": "שעה",
+      "fieldType": "time",
+      "required": true,
+      "orderIndex": 1,
+      "options": null
+    },
+    {
+      "formId": 1,
+      "fieldKey": "material_name",
+      "label": "שם חומר הגלם המחוטא",
+      "fieldType": "text",
+      "required": true,
+      "orderIndex": 2,
+      "options": null
+    },
+    {
+      "formId": 1,
+      "fieldKey": "actual_concentration_ppm",
+      "label": "ריכוז בפועל (ppm)",
+      "fieldType": "ppm_slider",
+      "required": true,
+      "orderIndex": 3,
+      "options": null
+    },
+    {
+      "formId": 1,
+      "fieldKey": "performed_by",
+      "label": "בוצע ע\"י",
+      "fieldType": "text",
+      "required": true,
+      "orderIndex": 4,
+      "options": null
+    },
+    {
+      "formId": 1,
+      "fieldKey": "status",
+      "label": "תקין / לא תקין",
+      "fieldType": "select",
+      "required": true,
+      "orderIndex": 5,
+      "options": "[\"תקין\",\"לא תקין\"]"
+    },
+    {
+      "formId": 1,
+      "fieldKey": "notes",
+      "label": "הערות",
+      "fieldType": "textarea",
+      "required": false,
+      "orderIndex": 6,
+      "options": null
+    },
+    {
+      "formId": 2,
+      "fieldKey": "products",
+      "label": "מוצרים לקירור מהיר",
+      "fieldType": "checklist",
+      "required": false,
+      "orderIndex": 0,
+      "options": "[\"בקר\",\"עוף\",\"דגים\",\"ירקות\",\"צלי בקר\",\"כרעיים\",\"שוקיים\",\"קישואים\",\"חצילים\",\"פלפלים\",\"אנטי פסטי\",\"סלק\",\"רטבים\"]"
+    },
+    {
+      "formId": 2,
+      "fieldKey": "date",
+      "label": "תאריך",
+      "fieldType": "date",
+      "required": true,
+      "orderIndex": 1,
+      "options": null
+    },
+    {
+      "formId": 2,
+      "fieldKey": "temp_entry",
+      "label": "טמפרטורה בהכנסה לקירור (°C)",
+      "fieldType": "number",
+      "required": true,
+      "orderIndex": 2,
+      "options": null
+    },
+    {
+      "formId": 2,
+      "fieldKey": "time_entry",
+      "label": "שעת הכנסה",
+      "fieldType": "time",
+      "required": true,
+      "orderIndex": 3,
+      "options": null
+    },
+    {
+      "formId": 2,
+      "fieldKey": "temp_exit",
+      "label": "טמפרטורה בהוצאה מהקירור (°C)",
+      "fieldType": "number",
+      "required": true,
+      "orderIndex": 4,
+      "options": null
+    },
+    {
+      "formId": 2,
+      "fieldKey": "time_exit",
+      "label": "שעת הוצאה",
+      "fieldType": "time",
+      "required": true,
+      "orderIndex": 5,
+      "options": null
+    },
+    {
+      "formId": 2,
+      "fieldKey": "inspector_name",
+      "label": "שם הבודק",
+      "fieldType": "text",
+      "required": true,
+      "orderIndex": 6,
+      "options": null
+    },
+    {
+      "formId": 2,
+      "fieldKey": "notes",
+      "label": "הערות",
+      "fieldType": "textarea",
+      "required": false,
+      "orderIndex": 7,
+      "options": null
+    },
+    {
+      "formId": 3,
+      "fieldKey": "receive_date",
+      "label": "תאריך קבלה",
+      "fieldType": "date",
+      "required": true,
+      "orderIndex": 0,
+      "options": null
+    },
+    {
+      "formId": 3,
+      "fieldKey": "product_name",
+      "label": "שם המוצר",
+      "fieldType": "text",
+      "required": true,
+      "orderIndex": 1,
+      "options": null
+    },
+    {
+      "formId": 3,
+      "fieldKey": "matches_delivery_note",
+      "label": "התאמה לתעודה (כמות/מוצר)",
+      "fieldType": "select",
+      "required": true,
+      "orderIndex": 2,
+      "options": "[\"תקין\",\"לא תקין\",\"חלקי\"]"
+    },
+    {
+      "formId": 3,
+      "fieldKey": "supplier",
+      "label": "ספק / יצרן",
+      "fieldType": "text",
+      "required": true,
+      "orderIndex": 3,
+      "options": null
+    },
+    {
+      "formId": 3,
+      "fieldKey": "product_temp",
+      "label": "טמפרטורת קבלת מוצר - צינון/הקפאה (°C)",
+      "fieldType": "number",
+      "required": true,
+      "orderIndex": 4,
+      "options": null
+    },
+    {
+      "formId": 3,
+      "fieldKey": "expiry_date",
+      "label": "תאריך תפוגה",
+      "fieldType": "date",
+      "required": true,
+      "orderIndex": 5,
+      "options": null
+    },
+    {
+      "formId": 3,
+      "fieldKey": "visual_check",
+      "label": "בדיקה ויזואלית (צבע, ריח, שלמות אריזה)",
+      "fieldType": "select",
+      "required": true,
+      "orderIndex": 6,
+      "options": "[\"תקין\",\"לא תקין\"]"
+    },
+    {
+      "formId": 3,
+      "fieldKey": "weight_kg",
+      "label": "משקל (ק\"ג)",
+      "fieldType": "number",
+      "required": false,
+      "orderIndex": 7,
+      "options": null
+    },
+    {
+      "formId": 3,
+      "fieldKey": "signer_name",
+      "label": "חתימה / שם",
+      "fieldType": "text",
+      "required": true,
+      "orderIndex": 8,
+      "options": null
+    },
+    {
+      "formId": 3,
+      "fieldKey": "notes",
+      "label": "הערות",
+      "fieldType": "textarea",
+      "required": false,
+      "orderIndex": 9,
+      "options": null
+    },
+    {
+      "formId": 4,
+      "fieldKey": "date",
+      "label": "תאריך בדיקה",
+      "fieldType": "date",
+      "required": true,
+      "orderIndex": 0,
+      "options": null
+    },
+    {
+      "formId": 4,
+      "fieldKey": "station_number",
+      "label": "מס' תחנה",
+      "fieldType": "text",
+      "required": true,
+      "orderIndex": 1,
+      "options": null
+    },
+    {
+      "formId": 4,
+      "fieldKey": "food_name",
+      "label": "שם המאכל",
+      "fieldType": "text",
+      "required": true,
+      "orderIndex": 2,
+      "options": null
+    },
+    {
+      "formId": 4,
+      "fieldKey": "food_category",
+      "label": "קטגוריה",
+      "fieldType": "select",
+      "required": true,
+      "orderIndex": 3,
+      "options": "[\"מרק\",\"מנות עיקריות\",\"תוספות\",\"סלטים\",\"אחר\"]"
+    },
+    {
+      "formId": 4,
+      "fieldKey": "temp_receiving",
+      "label": "טמפרטורה בקבלת המזון (°C)",
+      "fieldType": "temp_slider",
+      "required": true,
+      "orderIndex": 4,
+      "options": null
+    },
+    {
+      "formId": 4,
+      "fieldKey": "temp_oven",
+      "label": "טמפרטורה בהוצאה מהתנור (°C)",
+      "fieldType": "temp_slider",
+      "required": false,
+      "orderIndex": 5,
+      "options": null
+    },
+    {
+      "formId": 4,
+      "fieldKey": "temp_serving",
+      "label": "טמפרטורה בהגשה (°C)",
+      "fieldType": "temp_slider",
+      "required": true,
+      "orderIndex": 6,
+      "options": null
+    },
+    {
+      "formId": 4,
+      "fieldKey": "organoleptic_ok",
+      "label": "ביצוע בדיקה אורגנולפטית (ריח, צבע, מרקם, טעם)",
+      "fieldType": "select",
+      "required": true,
+      "orderIndex": 7,
+      "options": "[\"תקין\",\"לא תקין\"]"
+    },
+    {
+      "formId": 4,
+      "fieldKey": "food_sample_taken",
+      "label": "נלקחה דוגמת מזון (150 גרם לפחות)",
+      "fieldType": "checkbox",
+      "required": true,
+      "orderIndex": 8,
+      "options": null
+    },
+    {
+      "formId": 4,
+      "fieldKey": "produced_at_station",
+      "label": "יצור בתחנה",
+      "fieldType": "checkbox",
+      "required": false,
+      "orderIndex": 9,
+      "options": null
+    },
+    {
+      "formId": 4,
+      "fieldKey": "inspector_name",
+      "label": "שם הבודק",
+      "fieldType": "text",
+      "required": true,
+      "orderIndex": 10,
+      "options": null
+    },
+    {
+      "formId": 4,
+      "fieldKey": "notes",
+      "label": "הערות",
+      "fieldType": "textarea",
+      "required": false,
+      "orderIndex": 11,
+      "options": null
+    },
+    {
+      "formId": 5,
+      "fieldKey": "training_date",
+      "label": "תאריך ההדרכה",
+      "fieldType": "date",
+      "required": true,
+      "orderIndex": 0,
+      "options": null
+    },
+    {
+      "formId": 5,
+      "fieldKey": "station_name",
+      "label": "שם התחנה",
+      "fieldType": "text",
+      "required": true,
+      "orderIndex": 1,
+      "options": null
+    },
+    {
+      "formId": 5,
+      "fieldKey": "trainer_name",
+      "label": "שם המדריך",
+      "fieldType": "text",
+      "required": true,
+      "orderIndex": 2,
+      "options": null
+    },
+    {
+      "formId": 5,
+      "fieldKey": "training_subject",
+      "label": "תיאור נושא ההדרכה",
+      "fieldType": "textarea",
+      "required": true,
+      "orderIndex": 3,
+      "options": null
+    },
+    {
+      "formId": 5,
+      "fieldKey": "participant1_name",
+      "label": "שם משתתף 1",
+      "fieldType": "text",
+      "required": false,
+      "orderIndex": 4,
+      "options": null
+    },
+    {
+      "formId": 5,
+      "fieldKey": "participant2_name",
+      "label": "שם משתתף 2",
+      "fieldType": "text",
+      "required": false,
+      "orderIndex": 5,
+      "options": null
+    },
+    {
+      "formId": 5,
+      "fieldKey": "participant3_name",
+      "label": "שם משתתף 3",
+      "fieldType": "text",
+      "required": false,
+      "orderIndex": 6,
+      "options": null
+    },
+    {
+      "formId": 5,
+      "fieldKey": "participant4_name",
+      "label": "שם משתתף 4",
+      "fieldType": "text",
+      "required": false,
+      "orderIndex": 7,
+      "options": null
+    },
+    {
+      "formId": 5,
+      "fieldKey": "participant5_name",
+      "label": "שם משתתף 5",
+      "fieldType": "text",
+      "required": false,
+      "orderIndex": 8,
+      "options": null
+    },
+    {
+      "formId": 5,
+      "fieldKey": "participant6_name",
+      "label": "שם משתתף 6",
+      "fieldType": "text",
+      "required": false,
+      "orderIndex": 9,
+      "options": null
+    },
+    {
+      "formId": 5,
+      "fieldKey": "participant7_name",
+      "label": "שם משתתף 7",
+      "fieldType": "text",
+      "required": false,
+      "orderIndex": 10,
+      "options": null
+    },
+    {
+      "formId": 5,
+      "fieldKey": "participant8_name",
+      "label": "שם משתתף 8",
+      "fieldType": "text",
+      "required": false,
+      "orderIndex": 11,
+      "options": null
+    },
+    {
+      "formId": 5,
+      "fieldKey": "participant9_name",
+      "label": "שם משתתף 9",
+      "fieldType": "text",
+      "required": false,
+      "orderIndex": 12,
+      "options": null
+    },
+    {
+      "formId": 5,
+      "fieldKey": "participant10_name",
+      "label": "שם משתתף 10",
+      "fieldType": "text",
+      "required": false,
+      "orderIndex": 13,
+      "options": null
+    },
+    {
+      "formId": 5,
+      "fieldKey": "notes",
+      "label": "הערות נוספות",
+      "fieldType": "textarea",
+      "required": false,
+      "orderIndex": 14,
+      "options": null
+    },
+    {
+      "formId": 6,
+      "fieldKey": "date",
+      "label": "תאריך",
+      "fieldType": "date",
+      "required": true,
+      "orderIndex": 1,
+      "options": null
+    },
+    {
+      "formId": 6,
+      "fieldKey": "inspector_name",
+      "label": "שם הבודק",
+      "fieldType": "text",
+      "required": true,
+      "orderIndex": 2,
+      "options": null
+    },
+    {
+      "formId": 6,
+      "fieldKey": "unit_readings",
+      "label": "__units__",
+      "fieldType": "text",
+      "required": false,
+      "orderIndex": 3,
+      "options": null
+    },
+    {
+      "formId": 6,
+      "fieldKey": "notes",
+      "label": "חריגות / תקלות כלליות",
+      "fieldType": "textarea",
+      "required": false,
+      "orderIndex": 4,
+      "options": null
+    },
+    {
+      "formId": 7,
+      "fieldKey": "station_number",
+      "label": "מס׳ תחנה",
+      "fieldType": "text",
+      "required": false,
+      "orderIndex": 1,
+      "options": null
+    },
+    {
+      "formId": 7,
+      "fieldKey": "date",
+      "label": "תאריך בדיקה",
+      "fieldType": "date",
+      "required": true,
+      "orderIndex": 2,
+      "options": null
+    },
+    {
+      "formId": 7,
+      "fieldKey": "dish_readings",
+      "label": "__dishes__",
+      "fieldType": "text",
+      "required": false,
+      "orderIndex": 3,
+      "options": null
+    },
+    {
+      "formId": 7,
+      "fieldKey": "general_notes",
+      "label": "הערות כלליות",
+      "fieldType": "textarea",
+      "required": false,
+      "orderIndex": 4,
+      "options": null
+    },
+    {
+      "formId": 8,
+      "fieldKey": "station_number",
+      "label": "מס׳ תחנה",
+      "fieldType": "text",
+      "required": false,
+      "orderIndex": 1,
+      "options": null
+    },
+    {
+      "formId": 8,
+      "fieldKey": "date",
+      "label": "תאריך בדיקה",
+      "fieldType": "date",
+      "required": true,
+      "orderIndex": 2,
+      "options": null
+    },
+    {
+      "formId": 8,
+      "fieldKey": "dish_readings",
+      "label": "__dishes__",
+      "fieldType": "text",
+      "required": false,
+      "orderIndex": 3,
+      "options": null
+    },
+    {
+      "formId": 8,
+      "fieldKey": "general_notes",
+      "label": "הערות כלליות",
+      "fieldType": "textarea",
+      "required": false,
+      "orderIndex": 4,
+      "options": null
+    },
+    {
+      "formId": 9,
+      "fieldKey": "date",
+      "label": "תאריך",
+      "fieldType": "date",
+      "required": true,
+      "orderIndex": 1,
+      "options": null
+    },
+    {
+      "formId": 9,
+      "fieldKey": "shift_time",
+      "label": "שעת תחילת משמרת",
+      "fieldType": "time",
+      "required": false,
+      "orderIndex": 2,
+      "options": null
+    },
+    {
+      "formId": 9,
+      "fieldKey": "inspector_name",
+      "label": "שם הבודק/ת",
+      "fieldType": "text",
+      "required": true,
+      "orderIndex": 3,
+      "options": null
+    },
+    {
+      "formId": 9,
+      "fieldKey": "worker_checks",
+      "label": "__workers__",
+      "fieldType": "text",
+      "required": false,
+      "orderIndex": 4,
+      "options": null
+    },
+    {
+      "formId": 9,
+      "fieldKey": "notes",
+      "label": "הערות כלליות",
+      "fieldType": "textarea",
+      "required": false,
+      "orderIndex": 5,
+      "options": null
+    },
+    {
+      "formId": 10,
+      "fieldKey": "vegetables",
+      "label": "ירקות לחיטוי",
+      "fieldType": "checklist",
+      "required": false,
+      "orderIndex": 1,
+      "options": "[\"מלפפון\",\"עגבניה\",\"פלפל אדום\",\"פלפל צהוב\",\"פלפל ירוק\",\"פלפל חריף\",\"כרוב לבן\",\"כרוב אדום\",\"חסה\",\"קישואים\",\"סלק\",\"חצילים\",\"גזר\",\"בצל\",\"שום\",\"ברוקולי\",\"כרובית\",\"פטרוזיליה\",\"כוסברה\",\"תירס\",\"שמיר\",\"כרפס\"]"
+    },
+    {
+      "formId": 10,
+      "fieldKey": "fruits",
+      "label": "פירות לחיטוי",
+      "fieldType": "checklist",
+      "required": false,
+      "orderIndex": 2,
+      "options": "[\"תפוחים\",\"אגסים\",\"תפוזים\",\"קלמנטינות\",\"לימון\",\"ענבים\",\"אפרסק\",\"תות שדה\",\"מנגו\",\"אבטיח\",\"מלון\"]"
+    },
+    {
+      "formId": 10,
+      "fieldKey": "date",
+      "label": "תאריך",
+      "fieldType": "date",
+      "required": true,
+      "orderIndex": 3,
+      "options": null
+    },
+    {
+      "formId": 10,
+      "fieldKey": "time",
+      "label": "שעה",
+      "fieldType": "time",
+      "required": true,
+      "orderIndex": 4,
+      "options": null
+    },
+    {
+      "formId": 10,
+      "fieldKey": "actual_concentration_ppm",
+      "label": "ריכוז חומר חיטוי (ppm)",
+      "fieldType": "ppm_slider",
+      "required": true,
+      "orderIndex": 5,
+      "options": null
+    },
+    {
+      "formId": 10,
+      "fieldKey": "status",
+      "label": "תקין / לא תקין",
+      "fieldType": "select",
+      "required": true,
+      "orderIndex": 6,
+      "options": "[\"תקין\",\"לא תקין\"]"
+    },
+    {
+      "formId": 10,
+      "fieldKey": "performed_by",
+      "label": "בוצע ע\"י",
+      "fieldType": "text",
+      "required": true,
+      "orderIndex": 7,
+      "options": null
+    },
+    {
+      "formId": 10,
+      "fieldKey": "notes",
+      "label": "הערות",
+      "fieldType": "textarea",
+      "required": false,
+      "orderIndex": 8,
+      "options": null
+    },
+    {
+      "formId": 11,
+      "fieldKey": "production_date",
+      "label": "תאריך ייצור",
+      "fieldType": "date",
+      "required": true,
+      "orderIndex": 1,
+      "options": null
+    },
+    {
+      "formId": 11,
+      "fieldKey": "product_name",
+      "label": "שם המוצר",
+      "fieldType": "text",
+      "required": true,
+      "orderIndex": 2,
+      "options": null
+    },
+    {
+      "formId": 11,
+      "fieldKey": "cook_end_time",
+      "label": "שעת גמר בישול",
+      "fieldType": "time",
+      "required": true,
+      "orderIndex": 3,
+      "options": null
+    },
+    {
+      "formId": 11,
+      "fieldKey": "temp_exit_cooking",
+      "label": "טמפ' יציאה מבישול (°C) — לפחות 75 במרכז המוצר",
+      "fieldType": "temp_slider",
+      "required": true,
+      "orderIndex": 4,
+      "options": null
+    },
+    {
+      "formId": 11,
+      "fieldKey": "worker_name",
+      "label": "שם/חתימת העובד",
+      "fieldType": "text",
+      "required": true,
+      "orderIndex": 5,
+      "options": null
+    },
+    {
+      "formId": 11,
+      "fieldKey": "notes",
+      "label": "הערות",
+      "fieldType": "textarea",
+      "required": false,
+      "orderIndex": 6,
+      "options": null
+    },
+    {
+      "formId": 12,
+      "fieldKey": "date",
+      "label": "תאריך",
+      "fieldType": "date",
+      "required": true,
+      "orderIndex": 1,
+      "options": null
+    },
+    {
+      "formId": 12,
+      "fieldKey": "time",
+      "label": "שעה",
+      "fieldType": "time",
+      "required": true,
+      "orderIndex": 2,
+      "options": null
+    },
+    {
+      "formId": 12,
+      "fieldKey": "oil_filtered",
+      "label": "בוצע סינון שמן",
+      "fieldType": "checkbox",
+      "required": false,
+      "orderIndex": 3,
+      "options": null
+    },
+    {
+      "formId": 12,
+      "fieldKey": "oil_changed",
+      "label": "בוצעה החלפת שמן",
+      "fieldType": "checkbox",
+      "required": false,
+      "orderIndex": 4,
+      "options": null
+    },
+    {
+      "formId": 12,
+      "fieldKey": "oil_amount",
+      "label": "כמות שמן (ליטר)",
+      "fieldType": "text",
+      "required": false,
+      "orderIndex": 5,
+      "options": null
+    },
+    {
+      "formId": 12,
+      "fieldKey": "performed_by",
+      "label": "חתימת מבצע",
+      "fieldType": "text",
+      "required": true,
+      "orderIndex": 6,
+      "options": null
+    },
+    {
+      "formId": 12,
+      "fieldKey": "notes",
+      "label": "הערות",
+      "fieldType": "textarea",
+      "required": false,
+      "orderIndex": 7,
+      "options": null
+    },
+    {
+      "formId": 13,
+      "fieldKey": "product_type",
+      "label": "סוג מוצר",
+      "fieldType": "select",
+      "required": true,
+      "orderIndex": 0,
+      "options": "[\"בשר\",\"עוף\",\"דגים\"]"
+    },
+    {
+      "formId": 13,
+      "fieldKey": "product_name",
+      "label": "שם המוצר",
+      "fieldType": "text",
+      "required": true,
+      "orderIndex": 1,
+      "options": null
+    },
+    {
+      "formId": 13,
+      "fieldKey": "quantity",
+      "label": "כמות",
+      "fieldType": "text",
+      "required": true,
+      "orderIndex": 2,
+      "options": null
+    },
+    {
+      "formId": 13,
+      "fieldKey": "supplier",
+      "label": "שם ספק",
+      "fieldType": "text",
+      "required": true,
+      "orderIndex": 3,
+      "options": null
+    },
+    {
+      "formId": 13,
+      "fieldKey": "expiry_date",
+      "label": "תאריך תפוגה",
+      "fieldType": "date",
+      "required": true,
+      "orderIndex": 4,
+      "options": null
+    },
+    {
+      "formId": 13,
+      "fieldKey": "entry_time",
+      "label": "שעת הכנסה להפשרה",
+      "fieldType": "time",
+      "required": true,
+      "orderIndex": 5,
+      "options": null
+    },
+    {
+      "formId": 13,
+      "fieldKey": "exit_date",
+      "label": "תאריך הוצאה מהפשרה",
+      "fieldType": "date",
+      "required": false,
+      "orderIndex": 6,
+      "options": null
+    },
+    {
+      "formId": 13,
+      "fieldKey": "exit_time",
+      "label": "שעת הוצאה",
+      "fieldType": "time",
+      "required": false,
+      "orderIndex": 7,
+      "options": null
+    },
+    {
+      "formId": 13,
+      "fieldKey": "temp_end",
+      "label": "טמפרטורה בסיום הפשרה (°C)",
+      "fieldType": "number",
+      "required": false,
+      "orderIndex": 8,
+      "options": null
+    },
+    {
+      "formId": 13,
+      "fieldKey": "temp_status",
+      "label": "סטטוס טמפרטורה",
+      "fieldType": "text",
+      "required": false,
+      "orderIndex": 9,
+      "options": null
+    },
+    {
+      "formId": 13,
+      "fieldKey": "exit_notes",
+      "label": "הערות",
+      "fieldType": "textarea",
+      "required": false,
+      "orderIndex": 10,
+      "options": null
+    }
+  ]
+}
