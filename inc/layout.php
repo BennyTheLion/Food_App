@@ -6,12 +6,16 @@ function kl_h(string $s): string
     return htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
 }
 
-/** Base URL path of the app, detected from the request so it works from any deploy folder (root or subfolder). */
+/** Base URL path of the app, detected from the request so it works from any deploy folder (root or subfolder) and from inside admin/. */
 function kl_base_path(): string
 {
     static $base = null;
     if ($base === null) {
-        $base = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/');
+        $dir = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/');
+        if (substr($dir, -6) === '/admin') {
+            $dir = substr($dir, 0, -6);
+        }
+        $base = $dir;
     }
     return $base;
 }
@@ -53,15 +57,18 @@ function kl_topbar(?string $backHref = null, ?string $backLabel = null): void
     <?php
 }
 
-function kl_station_bar(): void
+/** Shows who's logged in and (if selected) their current site/kitchen, with links to switch or log out. */
+function kl_context_bar(array $user, ?array $kitchen = null): void
 {
     ?>
 <div class="station-bar">
   <div class="station-bar__row">
-    <label for="stationSelect">תחנה:</label>
-    <select id="stationSelect"></select>
-    <label for="fillerName">שם הממלא:</label>
-    <input type="text" id="fillerName" placeholder="הקלד/י שם" autocomplete="off">
+    <span>שלום, <?= kl_h($user['name']) ?><?= kl_is_admin($user) ? ' (מנהל)' : '' ?></span>
+    <?php if ($kitchen): ?>
+      <span>· <?= kl_h($kitchen['site_name']) ?> — <?= kl_h($kitchen['name']) ?></span>
+      <a href="<?= kl_h(kl_url('select-site.php')) ?>">החלפת מטבח</a>
+    <?php endif; ?>
+    <a href="<?= kl_h(kl_url('logout.php')) ?>" style="margin-inline-start:auto;">התנתקות</a>
   </div>
 </div>
     <?php

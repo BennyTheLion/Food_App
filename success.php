@@ -1,8 +1,10 @@
 <?php
 declare(strict_types=1);
 require __DIR__ . '/inc/db.php';
+require __DIR__ . '/inc/auth.php';
 require __DIR__ . '/inc/layout.php';
 
+$user = kl_require_login();
 $pdo = kl_db();
 $formId = (int) ($_GET['form'] ?? 0);
 $stmt = $pdo->prepare('SELECT * FROM forms WHERE id = :id');

@@ -1,7 +1,15 @@
 <?php
 declare(strict_types=1);
 require __DIR__ . '/inc/db.php';
+require __DIR__ . '/inc/auth.php';
 require __DIR__ . '/inc/layout.php';
+
+$user = kl_require_login();
+$kitchen = kl_require_kitchen($user);
+if (!$kitchen) {
+    header('Location: ' . kl_url('select-site.php'));
+    exit;
+}
 
 $pdo = kl_db();
 
@@ -9,8 +17,10 @@ $forms = $pdo->query('SELECT * FROM forms WHERE active = 1 ORDER BY id')->fetchA
 
 $today = (new DateTime())->format('Y-m-d');
 $doneToday = [];
-$stmt = $pdo->prepare("SELECT DISTINCT form_id FROM submissions WHERE substr(submitted_at, 1, 10) = :today");
-$stmt->execute([':today' => $today]);
+$stmt = $pdo->prepare(
+    "SELECT DISTINCT form_id FROM submissions WHERE kitchen_id = :kitchen_id AND substr(submitted_at, 1, 10) = :today"
+);
+$stmt->execute([':kitchen_id' => $kitchen['id'], ':today' => $today]);
 foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $fid) {
     $doneToday[(int) $fid] = true;
 }
@@ -22,13 +32,13 @@ foreach ($forms as $f) {
 
 kl_head('רשימת טפסים');
 kl_topbar();
-kl_station_bar();
+kl_context_bar($user, $kitchen);
 ?>
 <main class="container">
   <div class="hero">
     <div class="hero__eyebrow">בקרת בטיחות מזון</div>
     <h1>אילו בדיקות נותרו היום?</h1>
-    <p>בחר/י תחנה למעלה, ואז טופס לביצוע. טפסים שמולאו היום מסומנים בירוק.</p>
+    <p>טפסים שמולאו היום ב<?= kl_h($kitchen['name']) ?> מסומנים בירוק.</p>
   </div>
 
   <?php foreach ($grouped as $category => $items): ?>
@@ -62,11 +72,18 @@ kl_station_bar();
     <a class="form-card" href="<?= kl_h(kl_url('dashboard.php')) ?>">
       <span class="form-card__status done"></span>
       <span class="form-card__body">
-        <span class="form-card__title">לוח בקרה למנהל</span>
+        <span class="form-card__title">לוח בקרה</span>
         <span class="form-card__meta">סטטיסטיקות ורישומים אחרונים</span>
       </span>
       <span class="form-card__chevron">‹</span>
     </a>
+    <?php if (kl_is_admin($user)): ?>
+      <a class="form-card" href="<?= kl_h(kl_url('admin/index.php')) ?>">
+        <span class="form-card__status done"></span>
+        <span class="form-card__body"><span class="form-card__title">פאנל ניהול</span></span>
+        <span class="form-card__chevron">‹</span>
+      </a>
+    <?php endif; ?>
   </div>
 </main>
 <?php

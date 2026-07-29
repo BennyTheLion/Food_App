@@ -80,6 +80,8 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
   min-width: 0;
 }
 .station-bar label { color: var(--steel-300); }
+.station-bar a { color: var(--brass-500); text-decoration: none; font-weight: 600; }
+.station-bar a:hover { text-decoration: underline; }
 
 /* ---------- Section / category ---------- */
 .section-label {

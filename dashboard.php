@@ -1,42 +1,62 @@
 <?php
 declare(strict_types=1);
 require __DIR__ . '/inc/db.php';
+require __DIR__ . '/inc/auth.php';
 require __DIR__ . '/inc/layout.php';
+
+$user = kl_require_login();
+$kitchen = kl_require_kitchen($user);
+if (!$kitchen) {
+    header('Location: ' . kl_url('select-site.php'));
+    exit;
+}
 
 $pdo = kl_db();
 $today = (new DateTime())->format('Y-m-d');
+$kitchenId = (int) $kitchen['id'];
 
 $totalForms = (int) $pdo->query('SELECT COUNT(*) FROM forms WHERE active = 1')->fetchColumn();
 
-$doneTodayStmt = $pdo->prepare("SELECT COUNT(DISTINCT form_id) FROM submissions WHERE substr(submitted_at, 1, 10) = :today");
-$doneTodayStmt->execute([':today' => $today]);
+$doneTodayStmt = $pdo->prepare(
+    "SELECT COUNT(DISTINCT form_id) FROM submissions WHERE kitchen_id = :kitchen_id AND substr(submitted_at, 1, 10) = :today"
+);
+$doneTodayStmt->execute([':kitchen_id' => $kitchenId, ':today' => $today]);
 $doneTodayCount = (int) $doneTodayStmt->fetchColumn();
 
-$submissionsTodayStmt = $pdo->prepare("SELECT COUNT(*) FROM submissions WHERE substr(submitted_at, 1, 10) = :today");
-$submissionsTodayStmt->execute([':today' => $today]);
+$submissionsTodayStmt = $pdo->prepare(
+    "SELECT COUNT(*) FROM submissions WHERE kitchen_id = :kitchen_id AND substr(submitted_at, 1, 10) = :today"
+);
+$submissionsTodayStmt->execute([':kitchen_id' => $kitchenId, ':today' => $today]);
 $submissionsToday = (int) $submissionsTodayStmt->fetchColumn();
 
-$totalSubmissions = (int) $pdo->query('SELECT COUNT(*) FROM submissions')->fetchColumn();
+$totalStmt = $pdo->prepare('SELECT COUNT(*) FROM submissions WHERE kitchen_id = :kitchen_id');
+$totalStmt->execute([':kitchen_id' => $kitchenId]);
+$totalSubmissions = (int) $totalStmt->fetchColumn();
 
-$recent = $pdo->query(
-    'SELECT s.id, s.submitted_at, s.filler_name, s.station_name, s.kitchen_name, f.name AS form_name, f.category
-     FROM submissions s JOIN forms f ON f.id = s.form_id
+$recentStmt = $pdo->prepare(
+    'SELECT s.id, s.submitted_at, u.name AS filler_name, f.name AS form_name, f.category
+     FROM submissions s JOIN forms f ON f.id = s.form_id JOIN users u ON u.id = s.filled_by
+     WHERE s.kitchen_id = :kitchen_id
      ORDER BY s.id DESC LIMIT 25'
-)->fetchAll(PDO::FETCH_ASSOC);
+);
+$recentStmt->execute([':kitchen_id' => $kitchenId]);
+$recent = $recentStmt->fetchAll(PDO::FETCH_ASSOC);
 
-$missingStmt = $pdo->query(
+$missingStmt = $pdo->prepare(
     "SELECT f.id, f.name FROM forms f WHERE f.active = 1 AND f.id NOT IN (
-        SELECT form_id FROM submissions WHERE substr(submitted_at, 1, 10) = '" . $today . "'
+        SELECT form_id FROM submissions WHERE kitchen_id = :kitchen_id AND substr(submitted_at, 1, 10) = :today
      ) ORDER BY f.id"
 );
+$missingStmt->execute([':kitchen_id' => $kitchenId, ':today' => $today]);
 $missing = $missingStmt->fetchAll(PDO::FETCH_ASSOC);
 
 kl_head('לוח בקרה');
 kl_topbar(kl_url('index.php'), 'לרשימת הטפסים');
+kl_context_bar($user, $kitchen);
 ?>
 <main class="container">
   <div class="hero">
-    <div class="hero__eyebrow">לוח בקרה למנהל</div>
+    <div class="hero__eyebrow">לוח בקרה — <?= kl_h($kitchen['name']) ?></div>
     <h1>מצב התאמה — <?= kl_h((new DateTime())->format('d.m.Y')) ?></h1>
   </div>
 
@@ -76,20 +96,19 @@ kl_topbar(kl_url('index.php'), 'לרשימת הטפסים');
   <div class="table-scroll">
     <table class="log-table">
       <thead>
-        <tr><th>טופס</th><th>תחנה</th><th>ממלא</th><th>מועד</th><th></th></tr>
+        <tr><th>טופס</th><th>ממלא</th><th>מועד</th><th></th></tr>
       </thead>
       <tbody>
         <?php foreach ($recent as $r): ?>
           <tr>
             <td><?= kl_h($r['form_name']) ?></td>
-            <td><?= kl_h($r['station_name'] ?: '—') ?></td>
-            <td><?= kl_h($r['filler_name'] ?: '—') ?></td>
+            <td><?= kl_h($r['filler_name']) ?></td>
             <td class="mono"><?= kl_h($r['submitted_at']) ?></td>
             <td><a href="<?= kl_h(kl_url('submission.php')) ?>?id=<?= (int) $r['id'] ?>">פרטים ‹</a></td>
           </tr>
         <?php endforeach; ?>
         <?php if (!$recent): ?>
-          <tr><td colspan="5"><div class="empty">אין רישומים עדיין</div></td></tr>
+          <tr><td colspan="4"><div class="empty">אין רישומים עדיין</div></td></tr>
         <?php endif; ?>
       </tbody>
     </table>

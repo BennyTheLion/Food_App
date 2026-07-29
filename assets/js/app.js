@@ -1,50 +1,6 @@
 (function () {
   'use strict';
 
-  var STATIONS = ['מטבח ראשי', 'מטבח חלבי', 'בית קפה', 'מטבחון', 'תחנת הגשה'];
-  var STATION_KEY = 'kl_station_name';
-  var FILLER_KEY = 'kl_filler_name';
-
-  function initStationBar() {
-    var select = document.getElementById('stationSelect');
-    var fillerInput = document.getElementById('fillerName');
-    if (!select) return;
-
-    STATIONS.forEach(function (name) {
-      var opt = document.createElement('option');
-      opt.value = name;
-      opt.textContent = name;
-      select.appendChild(opt);
-    });
-
-    var savedStation = localStorage.getItem(STATION_KEY) || STATIONS[0];
-    select.value = savedStation;
-    document.querySelectorAll('.js-station-value').forEach(function (el) {
-      el.value = savedStation;
-    });
-
-    select.addEventListener('change', function () {
-      localStorage.setItem(STATION_KEY, select.value);
-      document.querySelectorAll('.js-station-value').forEach(function (el) {
-        el.value = select.value;
-      });
-      document.dispatchEvent(new CustomEvent('kl:station-changed'));
-    });
-
-    if (fillerInput) {
-      fillerInput.value = localStorage.getItem(FILLER_KEY) || '';
-      document.querySelectorAll('.js-filler-value').forEach(function (el) {
-        el.value = fillerInput.value;
-      });
-      fillerInput.addEventListener('input', function () {
-        localStorage.setItem(FILLER_KEY, fillerInput.value);
-        document.querySelectorAll('.js-filler-value').forEach(function (el) {
-          el.value = fillerInput.value;
-        });
-      });
-    }
-  }
-
   function initGauges() {
     document.querySelectorAll('.gauge').forEach(function (gauge) {
       var range = gauge.querySelector('input[type=range]');
@@ -113,7 +69,6 @@
   }
 
   document.addEventListener('DOMContentLoaded', function () {
-    initStationBar();
     initGauges();
     initDynamicRows();
     initDynamicRowsSerialize();
