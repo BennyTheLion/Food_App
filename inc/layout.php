@@ -37,7 +37,7 @@ function kl_head(string $title): void
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@500;700;800&family=Assistant:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="<?= kl_h(kl_url('assets/css/style.css')) ?>">
+<link rel="stylesheet" href="<?= kl_h(kl_url('assets/css/style.css')) ?>?v=<?= @filemtime(__DIR__ . '/../assets/css/style.css') ?: '1' ?>">
 </head>
 <body>
     <?php
@@ -77,7 +77,7 @@ function kl_context_bar(array $user, ?array $kitchen = null): void
 function kl_foot(): void
 {
     ?>
-<script src="<?= kl_h(kl_url('assets/js/app.js')) ?>"></script>
+<script src="<?= kl_h(kl_url('assets/js/app.js')) ?>?v=<?= @filemtime(__DIR__ . '/../assets/js/app.js') ?: '1' ?>"></script>
 </body>
 </html>
     <?php
