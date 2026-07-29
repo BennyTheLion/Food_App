@@ -9,6 +9,31 @@ function kl_admin_emails(): array
 }
 
 /**
+ * Plain-text alert to every admin, e.g. from cron/watcher.php. Standalone
+ * (doesn't depend on kl_h()/layout.php) since the watcher runs outside the
+ * normal page request chain. Content here is always system-generated, never
+ * user input, so plain text is fine -- no HTML escaping needed.
+ */
+function kl_send_alert_email(string $subject, string $bodyText): bool
+{
+    $admins = kl_admin_emails();
+    if (!$admins) {
+        return false;
+    }
+
+    $encodedSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
+    $headers = "MIME-Version: 1.0\r\n";
+    $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+    $headers .= 'From: ' . KL_MAIL_FROM . "\r\n";
+
+    $ok = true;
+    foreach ($admins as $email) {
+        $ok = mail($email, $encodedSubject, $bodyText, $headers) && $ok;
+    }
+    return $ok;
+}
+
+/**
  * Sends a submission's field values as an HTML table to every admin.
  * Uses PHP's mail(); Hostinger shared hosting sends this through its own
  * mail transfer agent, no SMTP config needed. Returns true only if every

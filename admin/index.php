@@ -10,6 +10,7 @@ $pdo = kl_db();
 
 $pendingCount = (int) $pdo->query("SELECT COUNT(*) FROM date_open_requests WHERE status = 'pending'")->fetchColumn();
 $activeLockCount = count(kl_all_active_locks());
+$health = $pdo->query('SELECT * FROM site_health WHERE id = 1')->fetch(PDO::FETCH_ASSOC);
 
 kl_head('פאנל ניהול');
 kl_topbar(kl_url('select-site.php'), 'לדף הבית');
@@ -61,6 +62,14 @@ kl_context_bar($user);
     <a class="form-card" href="<?= kl_h(kl_url('admin/activity-log.php')) ?>">
       <span class="form-card__status done"></span>
       <span class="form-card__body"><span class="form-card__title">יומן פעולות</span><span class="form-card__meta">התחברויות ופעולות ניהול</span></span>
+      <span class="form-card__chevron">‹</span>
+    </a>
+    <a class="form-card" href="<?= kl_h(kl_url('admin/site-health.php')) ?>">
+      <span class="form-card__status <?= ($health['status'] ?? '') === 'up' ? 'done' : '' ?>"></span>
+      <span class="form-card__body">
+        <span class="form-card__title">זמינות האתר</span>
+        <span class="form-card__meta"><?= $health ? ($health['status'] === 'up' ? 'פעיל' : 'לא זמין') : 'טרם נבדק' ?></span>
+      </span>
       <span class="form-card__chevron">‹</span>
     </a>
   </div>

@@ -8,6 +8,12 @@ const KL_DEFAULT_ADMIN_PASSWORD = 'ChangeMe123!';
 /** From-address used for "send to admin" emails. Must match a domain actually hosted on this Hostinger account. */
 const KL_MAIL_FROM = 'no-reply@darkorange-octopus-158387.hostingersite.com';
 
+/** Public URL of this deployment -- update if you attach a real domain. Used by cron/watcher.php to check the live site from the outside. */
+const KL_SITE_URL = 'https://darkorange-octopus-158387.hostingersite.com';
+
+/** Shared secret the watcher must present if triggered over HTTP instead of CLI (see cron/watcher.php). Feel free to regenerate this. */
+const KL_WATCHER_SECRET = '5701ddaba6305c3ee9eae250d1794883';
+
 function kl_db(): PDO
 {
     static $pdo = null;
@@ -91,6 +97,16 @@ function kl_db(): PDO
         action TEXT NOT NULL,
         details TEXT,
         created_at TEXT NOT NULL
+    )');
+
+    // Singleton row (id always 1) tracking uptime-watcher state, so it only
+    // emails on a status *change* rather than every single check.
+    $pdo->exec('CREATE TABLE IF NOT EXISTS site_health (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        status TEXT NOT NULL DEFAULT ' . "'unknown'" . ',
+        last_checked_at TEXT,
+        last_status_change_at TEXT,
+        last_error TEXT
     )');
 
     // users.site_id predates "every user can access every site/kitchen" -- no

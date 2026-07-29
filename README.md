@@ -37,6 +37,22 @@ The login page has a "Sign in with Google" button, currently disabled. To activa
 2. Set `KL_GOOGLE_CLIENT_ID` / `KL_GOOGLE_CLIENT_SECRET` in `inc/auth.php` (or better, load them from environment variables — don't commit real credentials)
 3. The button enables itself automatically once both constants are non-empty (`kl_google_login_enabled()` in `inc/auth.php`)
 
+## Uptime watcher
+
+`healthcheck.php` is a lightweight public endpoint that checks PHP + database connectivity and returns JSON. `cron/watcher.php` polls it, and emails every admin only when the status actually *changes* (not on every check) — down, and again when it recovers.
+
+**This needs to be set up in hPanel — I can't do this part myself, it requires your login:**
+
+1. In hPanel, go to **Advanced → Cron Jobs**
+2. Create a job that runs every 5–15 minutes
+3. If your plan supports running a command: `php /home/<your-account-path>/cron/watcher.php`
+   If it only supports fetching a URL: `https://<your-domain>/cron/watcher.php?secret=<KL_WATCHER_SECRET from inc/db.php>`
+4. Check **Admin → זמינות האתר** (Site Health) any time to see current status without waiting for an email
+
+**Real limitation worth knowing:** this cron job runs on the same Hostinger account it's checking. If the entire server or hosting account goes down, cron stops running too — so this catches application-level failures (a broken page, a database error, a bug) but not a total server outage. For that, point a free external service like [UptimeRobot](https://uptimerobot.com) at `healthcheck.php` too — that's a five-minute signup on their end, not something I can set up for you from inside this codebase.
+
+Change `KL_WATCHER_SECRET` in `inc/db.php` if you want to invalidate the current one (e.g. if it's ever been shared).
+
 ## Local development (XAMPP)
 
 Drop this folder anywhere under `htdocs`, make sure Apache is running, and visit `login.php` in that folder. The app detects its own base URL at runtime (`inc/layout.php::kl_base_path()`), so it works unchanged from any subfolder or from a domain root — no config file to edit.
@@ -81,4 +97,6 @@ inc/layout.php                                Shared header/footer, kl_url() bas
 assets/css/style.css                            Design system
 assets/js/app.js                                 Gauge readout, dynamic rows
 data/forms-data.json                              Source of truth for all 13 forms and their fields
+healthcheck.php                                     Public status endpoint (PHP + DB check), JSON response
+cron/watcher.php                                     Uptime watcher -- see "Uptime watcher" section above
 ```
