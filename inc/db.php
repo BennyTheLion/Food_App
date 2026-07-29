@@ -78,6 +78,8 @@ function kl_db(): PDO
         created_at TEXT NOT NULL
     )');
 
+    kl_migrate_legacy_submissions($pdo);
+
     $pdo->exec('CREATE TABLE IF NOT EXISTS submissions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         form_id INTEGER NOT NULL REFERENCES forms(id),
@@ -161,4 +163,31 @@ function kl_seed_default_admin(PDO $pdo): void
         ':role' => 'admin',
         ':created_at' => (new DateTime())->format('Y-m-d H:i:s'),
     ]);
+}
+
+/**
+ * Self-heal: some early deployments created `submissions` before the
+ * multi-site/kitchen schema existed (kitchen_name/station_name/filler_name
+ * columns instead of kitchen_id/filled_by). CREATE TABLE IF NOT EXISTS is a
+ * no-op against that stale table, so every query referencing kitchen_id
+ * would fail. Anything in that old table can only be pre-auth test data
+ * (no real kitchens/users existed yet to attribute rows to), so it's safe
+ * to drop and let it recreate with the current schema.
+ */
+function kl_migrate_legacy_submissions(PDO $pdo): void
+{
+    $tableExists = $pdo->query(
+        "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='submissions'"
+    )->fetchColumn();
+    if (!$tableExists) {
+        return;
+    }
+
+    $columns = array_column($pdo->query('PRAGMA table_info(submissions)')->fetchAll(PDO::FETCH_ASSOC), 'name');
+    if (in_array('kitchen_id', $columns, true)) {
+        return; // already current schema
+    }
+
+    $pdo->exec('DROP TABLE IF EXISTS submission_values');
+    $pdo->exec('DROP TABLE IF EXISTS submissions');
 }
