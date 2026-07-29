@@ -15,7 +15,7 @@ $submission = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$submission) {
     http_response_code(404);
     kl_head('רישום לא נמצא');
-    kl_topbar('/Food_App/kitchen-log-app/dashboard.php', 'ללוח הבקרה');
+    kl_topbar(kl_url('dashboard.php'), 'ללוח הבקרה');
     echo '<main class="container"><div class="empty">הרישום המבוקש לא נמצא.</div></main>';
     kl_foot();
     exit;
@@ -33,7 +33,7 @@ $valStmt->execute([':id' => $id]);
 $values = $valStmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
 kl_head($submission['form_name']);
-kl_topbar('/Food_App/kitchen-log-app/dashboard.php', 'ללוח הבקרה');
+kl_topbar(kl_url('dashboard.php'), 'ללוח הבקרה');
 ?>
 <main class="container">
   <div class="hero">

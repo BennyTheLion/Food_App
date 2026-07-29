@@ -10,7 +10,7 @@ $stmt->execute([':id' => $formId]);
 $form = $stmt->fetch(PDO::FETCH_ASSOC);
 
 kl_head('נשמר בהצלחה');
-kl_topbar('/Food_App/kitchen-log-app/index.php', 'לרשימת הטפסים');
+kl_topbar(kl_url('index.php'), 'לרשימת הטפסים');
 ?>
 <main class="container">
   <div class="success-card">
@@ -21,9 +21,9 @@ kl_topbar('/Food_App/kitchen-log-app/index.php', 'לרשימת הטפסים');
     </p>
     <div style="margin-top:28px; display:flex; flex-direction:column; gap:10px; align-items:center;">
       <?php if ($form): ?>
-        <a class="btn btn-primary" href="/Food_App/kitchen-log-app/form.php?id=<?= (int) $form['id'] ?>">מילוי נוסף של אותו טופס</a>
+        <a class="btn btn-primary" href="<?= kl_h(kl_url('form.php')) ?>?id=<?= (int) $form['id'] ?>">מילוי נוסף של אותו טופס</a>
       <?php endif; ?>
-      <a class="btn btn-ghost" href="/Food_App/kitchen-log-app/index.php">חזרה לרשימת הטפסים</a>
+      <a class="btn btn-ghost" href="<?= kl_h(kl_url('index.php')) ?>">חזרה לרשימת הטפסים</a>
     </div>
   </div>
 </main>

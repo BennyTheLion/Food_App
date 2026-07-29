@@ -14,7 +14,7 @@ $form = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$form) {
     http_response_code(404);
     kl_head('טופס לא נמצא');
-    kl_topbar('/Food_App/kitchen-log-app/index.php', 'לרשימת הטפסים');
+    kl_topbar(kl_url('index.php'), 'לרשימת הטפסים');
     echo '<main class="container"><div class="empty">הטופס המבוקש לא נמצא.</div></main>';
     kl_foot();
     exit;
@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $pdo->commit();
 
-        header('Location: /Food_App/kitchen-log-app/success.php?form=' . $formId . '&sid=' . $submissionId);
+        header('Location: ' . kl_url('success.php') . '?form=' . $formId . '&sid=' . $submissionId);
         exit;
     }
 }
@@ -110,7 +110,7 @@ function kl_render_dynamic_rows(string $fieldKey, string $kind): void
 }
 
 kl_head($form['name']);
-kl_topbar('/Food_App/kitchen-log-app/index.php', 'לרשימת הטפסים');
+kl_topbar(kl_url('index.php'), 'לרשימת הטפסים');
 kl_station_bar();
 ?>
 <main class="container">

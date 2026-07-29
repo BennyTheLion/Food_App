@@ -42,7 +42,7 @@ kl_station_bar();
           }
           $isDone = !empty($doneToday[(int) $f['id']]);
         ?>
-        <a class="form-card" href="/Food_App/kitchen-log-app/form.php?id=<?= (int) $f['id'] ?>">
+        <a class="form-card" href="<?= kl_h(kl_url('form.php')) ?>?id=<?= (int) $f['id'] ?>">
           <span class="form-card__status <?= $isDone ? 'done' : '' ?>"></span>
           <span class="form-card__body">
             <span class="form-card__title"><?= kl_h($f['name']) ?></span>
@@ -59,7 +59,7 @@ kl_station_bar();
 
   <div class="section-label">ניהול</div>
   <div class="card-list">
-    <a class="form-card" href="/Food_App/kitchen-log-app/dashboard.php">
+    <a class="form-card" href="<?= kl_h(kl_url('dashboard.php')) ?>">
       <span class="form-card__status done"></span>
       <span class="form-card__body">
         <span class="form-card__title">לוח בקרה למנהל</span>

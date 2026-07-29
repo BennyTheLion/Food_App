@@ -32,7 +32,7 @@ $missingStmt = $pdo->query(
 $missing = $missingStmt->fetchAll(PDO::FETCH_ASSOC);
 
 kl_head('לוח בקרה');
-kl_topbar('/Food_App/kitchen-log-app/index.php', 'לרשימת הטפסים');
+kl_topbar(kl_url('index.php'), 'לרשימת הטפסים');
 ?>
 <main class="container">
   <div class="hero">
@@ -63,7 +63,7 @@ kl_topbar('/Food_App/kitchen-log-app/index.php', 'לרשימת הטפסים');
     <div class="section-label">טרם בוצעו היום</div>
     <div class="card-list">
       <?php foreach ($missing as $f): ?>
-        <a class="form-card" href="/Food_App/kitchen-log-app/form.php?id=<?= (int) $f['id'] ?>">
+        <a class="form-card" href="<?= kl_h(kl_url('form.php')) ?>?id=<?= (int) $f['id'] ?>">
           <span class="form-card__status"></span>
           <span class="form-card__body"><span class="form-card__title"><?= kl_h($f['name']) ?></span></span>
           <span class="form-card__chevron">‹</span>
@@ -85,7 +85,7 @@ kl_topbar('/Food_App/kitchen-log-app/index.php', 'לרשימת הטפסים');
             <td><?= kl_h($r['station_name'] ?: '—') ?></td>
             <td><?= kl_h($r['filler_name'] ?: '—') ?></td>
             <td class="mono"><?= kl_h($r['submitted_at']) ?></td>
-            <td><a href="/Food_App/kitchen-log-app/submission.php?id=<?= (int) $r['id'] ?>">פרטים ‹</a></td>
+            <td><a href="<?= kl_h(kl_url('submission.php')) ?>?id=<?= (int) $r['id'] ?>">פרטים ‹</a></td>
           </tr>
         <?php endforeach; ?>
         <?php if (!$recent): ?>
