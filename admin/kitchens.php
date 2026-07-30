@@ -31,12 +31,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         } elseif ($op === 'delete') {
             $id = (int) ($_POST['id'] ?? 0);
-            $nameStmt = $pdo->prepare('SELECT name FROM kitchens WHERE id = :id');
-            $nameStmt->execute([':id' => $id]);
-            $name = (string) $nameStmt->fetchColumn();
-            $stmt = $pdo->prepare('DELETE FROM kitchens WHERE id = :id');
-            $stmt->execute([':id' => $id]);
-            kl_log_activity((int) $user['id'], 'kitchen_deleted', $name);
+            $countStmt = $pdo->prepare('SELECT COUNT(*) FROM submissions WHERE kitchen_id = :id');
+            $countStmt->execute([':id' => $id]);
+            $submissionCount = (int) $countStmt->fetchColumn();
+
+            $logStmt = $pdo->prepare('SELECT COUNT(*) FROM kitchen_connection_log WHERE kitchen_id = :id');
+            $logStmt->execute([':id' => $id]);
+            $connectionCount = (int) $logStmt->fetchColumn();
+
+            $requestStmt = $pdo->prepare('SELECT COUNT(*) FROM date_open_requests WHERE kitchen_id = :id');
+            $requestStmt->execute([':id' => $id]);
+            $requestCount = (int) $requestStmt->fetchColumn();
+
+            if ($submissionCount > 0) {
+                $error = 'לא ניתן למחוק מטבח שיש בו רישומי טפסים — הנתונים חייבים להישמר.';
+            } elseif ($connectionCount > 0 || $requestCount > 0) {
+                $error = 'לא ניתן למחוק מטבח עם היסטוריית שימוש (חיבורים או בקשות תאריך).';
+            } else {
+                $pdo->prepare('DELETE FROM kitchen_locks WHERE kitchen_id = :id')->execute([':id' => $id]);
+                $nameStmt = $pdo->prepare('SELECT name FROM kitchens WHERE id = :id');
+                $nameStmt->execute([':id' => $id]);
+                $name = (string) $nameStmt->fetchColumn();
+                $stmt = $pdo->prepare('DELETE FROM kitchens WHERE id = :id');
+                $stmt->execute([':id' => $id]);
+                kl_log_activity((int) $user['id'], 'kitchen_deleted', $name);
+            }
         }
     } catch (PDOException $e) {
         $error = 'שגיאה בשמירה: ' . $e->getMessage();
