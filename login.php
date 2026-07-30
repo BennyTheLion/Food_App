@@ -23,6 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($user && $user['password_hash'] && password_verify($password, $user['password_hash'])) {
         kl_login($user);
+        if (!empty($_POST['remember'])) {
+            kl_issue_remember_token((int) $user['id']);
+        }
         kl_log_activity((int) $user['id'], 'login');
         header('Location: ' . kl_url('select-site.php'));
         exit;
@@ -66,6 +69,10 @@ kl_topbar();
           </button>
         </div>
       </div>
+      <label class="field-check" style="margin-bottom:22px;">
+        <input type="checkbox" name="remember" value="1">
+        <span>זכור אותי</span>
+      </label>
       <button type="submit" class="btn btn-primary btn-block">התחבר/י</button>
     </form>
 

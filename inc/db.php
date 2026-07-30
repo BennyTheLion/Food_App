@@ -135,6 +135,14 @@ function kl_db(): PDO
         created_at TEXT NOT NULL
     )');
 
+    $pdo->exec('CREATE TABLE IF NOT EXISTS remember_tokens (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL REFERENCES users(id),
+        selector TEXT NOT NULL UNIQUE,
+        validator_hash TEXT NOT NULL,
+        expires_at TEXT NOT NULL
+    )');
+
     $pdo->exec('CREATE TABLE IF NOT EXISTS date_open_requests (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         kitchen_id INTEGER NOT NULL REFERENCES kitchens(id),

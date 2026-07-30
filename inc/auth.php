@@ -22,10 +22,81 @@ function kl_start_session(): void
     }
 }
 
+const KL_REMEMBER_COOKIE = 'kl_remember';
+const KL_REMEMBER_DAYS = 30;
+
+/** Issues a fresh remember-me cookie + DB token (selector/validator pattern — only a hash of the validator is stored). */
+function kl_issue_remember_token(int $userId): void
+{
+    $pdo = kl_db();
+    $selector = bin2hex(random_bytes(9));
+    $validator = bin2hex(random_bytes(32));
+
+    $pdo->prepare(
+        'INSERT INTO remember_tokens (user_id, selector, validator_hash, expires_at) VALUES (:user_id, :selector, :hash, :expires_at)'
+    )->execute([
+        ':user_id' => $userId,
+        ':selector' => $selector,
+        ':hash' => hash('sha256', $validator),
+        ':expires_at' => (new DateTime('+' . KL_REMEMBER_DAYS . ' days'))->format('Y-m-d H:i:s'),
+    ]);
+
+    setcookie(KL_REMEMBER_COOKIE, $selector . ':' . $validator, [
+        'expires' => time() + KL_REMEMBER_DAYS * 86400,
+        'path' => '/',
+        'httponly' => true,
+        'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+        'samesite' => 'Lax',
+    ]);
+}
+
+function kl_clear_remember_token(): void
+{
+    if (!empty($_COOKIE[KL_REMEMBER_COOKIE])) {
+        $selector = explode(':', $_COOKIE[KL_REMEMBER_COOKIE], 2)[0];
+        kl_db()->prepare('DELETE FROM remember_tokens WHERE selector = :selector')->execute([':selector' => $selector]);
+    }
+    setcookie(KL_REMEMBER_COOKIE, '', ['expires' => time() - 3600, 'path' => '/']);
+    unset($_COOKIE[KL_REMEMBER_COOKIE]);
+}
+
+/** Logs the user in from a valid remember-me cookie when there's no active session, rotating the token on use. */
+function kl_try_remember_login(): void
+{
+    if (!empty($_SESSION['user_id']) || empty($_COOKIE[KL_REMEMBER_COOKIE])) {
+        return;
+    }
+    $parts = explode(':', $_COOKIE[KL_REMEMBER_COOKIE], 2);
+    if (count($parts) !== 2) {
+        return;
+    }
+    [$selector, $validator] = $parts;
+
+    $pdo = kl_db();
+    $stmt = $pdo->prepare('SELECT * FROM remember_tokens WHERE selector = :selector');
+    $stmt->execute([':selector' => $selector]);
+    $token = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $valid = $token
+        && hash_equals($token['validator_hash'], hash('sha256', $validator))
+        && $token['expires_at'] >= (new DateTime())->format('Y-m-d H:i:s');
+
+    if (!$valid) {
+        kl_clear_remember_token();
+        return;
+    }
+
+    $pdo->prepare('DELETE FROM remember_tokens WHERE id = :id')->execute([':id' => $token['id']]);
+    session_regenerate_id(true);
+    $_SESSION['user_id'] = (int) $token['user_id'];
+    kl_issue_remember_token((int) $token['user_id']);
+}
+
 function kl_current_user(): ?array
 {
     kl_start_session();
     $pdo = kl_db(); // guarantees schema/seed exist even before any login has happened
+    kl_try_remember_login();
 
     if (empty($_SESSION['user_id'])) {
         return null;
@@ -57,6 +128,7 @@ function kl_login(array $user): void
 function kl_logout(): void
 {
     kl_start_session();
+    kl_clear_remember_token();
     $_SESSION = [];
     session_destroy();
 }
