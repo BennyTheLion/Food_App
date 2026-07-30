@@ -7,37 +7,44 @@ require __DIR__ . '/../inc/layout.php';
 
 $user = kl_require_admin();
 $pdo = kl_db();
+$error = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $op = $_POST['op'] ?? '';
-    if ($op === 'create') {
-        $name = trim((string) ($_POST['name'] ?? ''));
-        $roomId = (int) ($_POST['dining_room_id'] ?? 0);
-        if ($name !== '' && $roomId) {
-            $stmt = $pdo->prepare('INSERT INTO kitchens (dining_room_id, name, created_at) VALUES (:room_id, :name, :created_at)');
-            $stmt->execute([':room_id' => $roomId, ':name' => $name, ':created_at' => (new DateTime())->format('Y-m-d H:i:s')]);
-            kl_log_activity((int) $user['id'], 'kitchen_created', $name);
+    try {
+        if ($op === 'create') {
+            $name = trim((string) ($_POST['name'] ?? ''));
+            $roomId = (int) ($_POST['dining_room_id'] ?? 0);
+            if ($name !== '' && $roomId) {
+                $stmt = $pdo->prepare('INSERT INTO kitchens (dining_room_id, name, created_at) VALUES (:room_id, :name, :created_at)');
+                $stmt->execute([':room_id' => $roomId, ':name' => $name, ':created_at' => (new DateTime())->format('Y-m-d H:i:s')]);
+                kl_log_activity((int) $user['id'], 'kitchen_created', $name);
+            }
+        } elseif ($op === 'update') {
+            $id = (int) ($_POST['id'] ?? 0);
+            $name = trim((string) ($_POST['name'] ?? ''));
+            $roomId = (int) ($_POST['dining_room_id'] ?? 0);
+            if ($id && $name !== '' && $roomId) {
+                $stmt = $pdo->prepare('UPDATE kitchens SET name = :name, dining_room_id = :room_id WHERE id = :id');
+                $stmt->execute([':name' => $name, ':room_id' => $roomId, ':id' => $id]);
+                kl_log_activity((int) $user['id'], 'kitchen_updated', $name);
+            }
+        } elseif ($op === 'delete') {
+            $id = (int) ($_POST['id'] ?? 0);
+            $nameStmt = $pdo->prepare('SELECT name FROM kitchens WHERE id = :id');
+            $nameStmt->execute([':id' => $id]);
+            $name = (string) $nameStmt->fetchColumn();
+            $stmt = $pdo->prepare('DELETE FROM kitchens WHERE id = :id');
+            $stmt->execute([':id' => $id]);
+            kl_log_activity((int) $user['id'], 'kitchen_deleted', $name);
         }
-    } elseif ($op === 'update') {
-        $id = (int) ($_POST['id'] ?? 0);
-        $name = trim((string) ($_POST['name'] ?? ''));
-        $roomId = (int) ($_POST['dining_room_id'] ?? 0);
-        if ($id && $name !== '' && $roomId) {
-            $stmt = $pdo->prepare('UPDATE kitchens SET name = :name, dining_room_id = :room_id WHERE id = :id');
-            $stmt->execute([':name' => $name, ':room_id' => $roomId, ':id' => $id]);
-            kl_log_activity((int) $user['id'], 'kitchen_updated', $name);
-        }
-    } elseif ($op === 'delete') {
-        $id = (int) ($_POST['id'] ?? 0);
-        $nameStmt = $pdo->prepare('SELECT name FROM kitchens WHERE id = :id');
-        $nameStmt->execute([':id' => $id]);
-        $name = (string) $nameStmt->fetchColumn();
-        $stmt = $pdo->prepare('DELETE FROM kitchens WHERE id = :id');
-        $stmt->execute([':id' => $id]);
-        kl_log_activity((int) $user['id'], 'kitchen_deleted', $name);
+    } catch (PDOException $e) {
+        $error = 'שגיאה בשמירה: ' . $e->getMessage();
     }
-    header('Location: ' . kl_url('admin/kitchens.php'));
-    exit;
+    if (!$error) {
+        header('Location: ' . kl_url('admin/kitchens.php'));
+        exit;
+    }
 }
 
 $rooms = $pdo->query(
@@ -60,6 +67,10 @@ kl_context_bar($user);
     <div class="hero__eyebrow">ניהול מערכת</div>
     <h1>מטבחים</h1>
   </div>
+
+  <?php if ($error): ?>
+    <div class="banner banner--danger"><?= kl_h($error) ?></div>
+  <?php endif; ?>
 
   <?php if (!$rooms): ?>
     <div class="empty">יש ליצור חדר אוכל קודם ב<a href="<?= kl_h(kl_url('admin/dining-rooms.php')) ?>">ניהול חדרי אוכל</a>.</div>

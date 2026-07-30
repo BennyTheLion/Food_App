@@ -11,34 +11,38 @@ $error = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $op = $_POST['op'] ?? '';
-    if ($op === 'create') {
-        $name = trim((string) ($_POST['name'] ?? ''));
-        if ($name !== '') {
-            $stmt = $pdo->prepare('INSERT INTO sites (name, created_at) VALUES (:name, :created_at)');
-            $stmt->execute([':name' => $name, ':created_at' => (new DateTime())->format('Y-m-d H:i:s')]);
-            kl_log_activity((int) $user['id'], 'site_created', $name);
+    try {
+        if ($op === 'create') {
+            $name = trim((string) ($_POST['name'] ?? ''));
+            if ($name !== '') {
+                $stmt = $pdo->prepare('INSERT INTO sites (name, created_at) VALUES (:name, :created_at)');
+                $stmt->execute([':name' => $name, ':created_at' => (new DateTime())->format('Y-m-d H:i:s')]);
+                kl_log_activity((int) $user['id'], 'site_created', $name);
+            }
+        } elseif ($op === 'rename') {
+            $id = (int) ($_POST['id'] ?? 0);
+            $name = trim((string) ($_POST['name'] ?? ''));
+            if ($id && $name !== '') {
+                $stmt = $pdo->prepare('UPDATE sites SET name = :name WHERE id = :id');
+                $stmt->execute([':name' => $name, ':id' => $id]);
+                kl_log_activity((int) $user['id'], 'site_renamed', $name);
+            }
+        } elseif ($op === 'delete') {
+            $id = (int) ($_POST['id'] ?? 0);
+            $stmt = $pdo->prepare('SELECT COUNT(*) FROM dining_rooms WHERE site_id = :id');
+            $stmt->execute([':id' => $id]);
+            if ((int) $stmt->fetchColumn() > 0) {
+                $error = 'לא ניתן למחוק אתר שיש בו חדרי אוכל — יש למחוק קודם את חדרי האוכל.';
+            } else {
+                $nameStmt = $pdo->prepare('SELECT name FROM sites WHERE id = :id');
+                $nameStmt->execute([':id' => $id]);
+                $del = $pdo->prepare('DELETE FROM sites WHERE id = :id');
+                $del->execute([':id' => $id]);
+                kl_log_activity((int) $user['id'], 'site_deleted', (string) $nameStmt->fetchColumn());
+            }
         }
-    } elseif ($op === 'rename') {
-        $id = (int) ($_POST['id'] ?? 0);
-        $name = trim((string) ($_POST['name'] ?? ''));
-        if ($id && $name !== '') {
-            $stmt = $pdo->prepare('UPDATE sites SET name = :name WHERE id = :id');
-            $stmt->execute([':name' => $name, ':id' => $id]);
-            kl_log_activity((int) $user['id'], 'site_renamed', $name);
-        }
-    } elseif ($op === 'delete') {
-        $id = (int) ($_POST['id'] ?? 0);
-        $stmt = $pdo->prepare('SELECT COUNT(*) FROM dining_rooms WHERE site_id = :id');
-        $stmt->execute([':id' => $id]);
-        if ((int) $stmt->fetchColumn() > 0) {
-            $error = 'לא ניתן למחוק אתר שיש בו חדרי אוכל — יש למחוק קודם את חדרי האוכל.';
-        } else {
-            $nameStmt = $pdo->prepare('SELECT name FROM sites WHERE id = :id');
-            $nameStmt->execute([':id' => $id]);
-            $del = $pdo->prepare('DELETE FROM sites WHERE id = :id');
-            $del->execute([':id' => $id]);
-            kl_log_activity((int) $user['id'], 'site_deleted', (string) $nameStmt->fetchColumn());
-        }
+    } catch (PDOException $e) {
+        $error = 'שגיאה בשמירה: ' . $e->getMessage();
     }
     if (!$error) {
         header('Location: ' . kl_url('admin/sites.php'));

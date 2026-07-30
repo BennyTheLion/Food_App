@@ -27,6 +27,9 @@ function kl_url(string $path): string
 
 function kl_head(string $title): void
 {
+    if (!headers_sent()) {
+        header('Content-Type: text/html; charset=UTF-8');
+    }
     ?>
 <!doctype html>
 <html lang="he" dir="rtl">

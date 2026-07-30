@@ -11,36 +11,40 @@ $error = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $op = $_POST['op'] ?? '';
-    if ($op === 'create') {
-        $name = trim((string) ($_POST['name'] ?? ''));
-        $siteId = (int) ($_POST['site_id'] ?? 0);
-        if ($name !== '' && $siteId) {
-            $stmt = $pdo->prepare('INSERT INTO dining_rooms (site_id, name, created_at) VALUES (:site_id, :name, :created_at)');
-            $stmt->execute([':site_id' => $siteId, ':name' => $name, ':created_at' => (new DateTime())->format('Y-m-d H:i:s')]);
-            kl_log_activity((int) $user['id'], 'dining_room_created', $name);
+    try {
+        if ($op === 'create') {
+            $name = trim((string) ($_POST['name'] ?? ''));
+            $siteId = (int) ($_POST['site_id'] ?? 0);
+            if ($name !== '' && $siteId) {
+                $stmt = $pdo->prepare('INSERT INTO dining_rooms (site_id, name, created_at) VALUES (:site_id, :name, :created_at)');
+                $stmt->execute([':site_id' => $siteId, ':name' => $name, ':created_at' => (new DateTime())->format('Y-m-d H:i:s')]);
+                kl_log_activity((int) $user['id'], 'dining_room_created', $name);
+            }
+        } elseif ($op === 'update') {
+            $id = (int) ($_POST['id'] ?? 0);
+            $name = trim((string) ($_POST['name'] ?? ''));
+            $siteId = (int) ($_POST['site_id'] ?? 0);
+            if ($id && $name !== '' && $siteId) {
+                $stmt = $pdo->prepare('UPDATE dining_rooms SET name = :name, site_id = :site_id WHERE id = :id');
+                $stmt->execute([':name' => $name, ':site_id' => $siteId, ':id' => $id]);
+                kl_log_activity((int) $user['id'], 'dining_room_updated', $name);
+            }
+        } elseif ($op === 'delete') {
+            $id = (int) ($_POST['id'] ?? 0);
+            $stmt = $pdo->prepare('SELECT COUNT(*) FROM kitchens WHERE dining_room_id = :id');
+            $stmt->execute([':id' => $id]);
+            if ((int) $stmt->fetchColumn() > 0) {
+                $error = 'לא ניתן למחוק חדר אוכל שיש בו מטבחים — יש למחוק קודם את המטבחים.';
+            } else {
+                $nameStmt = $pdo->prepare('SELECT name FROM dining_rooms WHERE id = :id');
+                $nameStmt->execute([':id' => $id]);
+                $del = $pdo->prepare('DELETE FROM dining_rooms WHERE id = :id');
+                $del->execute([':id' => $id]);
+                kl_log_activity((int) $user['id'], 'dining_room_deleted', (string) $nameStmt->fetchColumn());
+            }
         }
-    } elseif ($op === 'update') {
-        $id = (int) ($_POST['id'] ?? 0);
-        $name = trim((string) ($_POST['name'] ?? ''));
-        $siteId = (int) ($_POST['site_id'] ?? 0);
-        if ($id && $name !== '' && $siteId) {
-            $stmt = $pdo->prepare('UPDATE dining_rooms SET name = :name, site_id = :site_id WHERE id = :id');
-            $stmt->execute([':name' => $name, ':site_id' => $siteId, ':id' => $id]);
-            kl_log_activity((int) $user['id'], 'dining_room_updated', $name);
-        }
-    } elseif ($op === 'delete') {
-        $id = (int) ($_POST['id'] ?? 0);
-        $stmt = $pdo->prepare('SELECT COUNT(*) FROM kitchens WHERE dining_room_id = :id');
-        $stmt->execute([':id' => $id]);
-        if ((int) $stmt->fetchColumn() > 0) {
-            $error = 'לא ניתן למחוק חדר אוכל שיש בו מטבחים — יש למחוק קודם את המטבחים.';
-        } else {
-            $nameStmt = $pdo->prepare('SELECT name FROM dining_rooms WHERE id = :id');
-            $nameStmt->execute([':id' => $id]);
-            $del = $pdo->prepare('DELETE FROM dining_rooms WHERE id = :id');
-            $del->execute([':id' => $id]);
-            kl_log_activity((int) $user['id'], 'dining_room_deleted', (string) $nameStmt->fetchColumn());
-        }
+    } catch (PDOException $e) {
+        $error = 'שגיאה בשמירה: ' . $e->getMessage();
     }
     if (!$error) {
         header('Location: ' . kl_url('admin/dining-rooms.php'));
