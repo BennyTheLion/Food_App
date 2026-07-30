@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/../inc/db.php';
 require __DIR__ . '/../inc/mailer.php';
+require __DIR__ . '/../inc/whatsapp.php';
 
 $isCli = PHP_SAPI === 'cli';
 if (!$isCli) {
@@ -87,16 +88,15 @@ $pdo->prepare(
 $alertSent = false;
 if ($statusChanged && $previousStatus !== 'unknown') {
     if ($newStatus === 'down') {
-        $alertSent = kl_send_alert_email(
-            '🔴 האתר אינו זמין',
-            "האתר בכתובת " . KL_SITE_URL . " אינו מגיב כראוי.\n\nשגיאה: $error\n\nזמן: $now"
-        );
+        $subject = '🔴 האתר אינו זמין';
+        $body = "האתר בכתובת " . KL_SITE_URL . " אינו מגיב כראוי.\n\nשגיאה: $error\n\nזמן: $now";
     } else {
-        $alertSent = kl_send_alert_email(
-            '🟢 האתר חזר לפעול',
-            "האתר בכתובת " . KL_SITE_URL . " חזר לפעול כרגיל.\n\nזמן: $now"
-        );
+        $subject = '🟢 האתר חזר לפעול';
+        $body = "האתר בכתובת " . KL_SITE_URL . " חזר לפעול כרגיל.\n\nזמן: $now";
     }
+    $emailSent = kl_send_alert_email($subject, $body);
+    $whatsappSent = kl_send_whatsapp_alert("$subject\n\n$body");
+    $alertSent = $emailSent || $whatsappSent;
 }
 
 $durationMs = (int) round((microtime(true) - $runStart) * 1000);
