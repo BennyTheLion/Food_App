@@ -3,6 +3,7 @@ declare(strict_types=1);
 require __DIR__ . '/inc/db.php';
 require __DIR__ . '/inc/auth.php';
 require __DIR__ . '/inc/kitchen_lock.php';
+require __DIR__ . '/inc/deferred.php';
 require __DIR__ . '/inc/layout.php';
 
 $user = kl_require_login();
@@ -31,6 +32,8 @@ foreach ($forms as $f) {
     $grouped[$f['category']][] = $f;
 }
 
+$openDeferred = kl_open_deferred_submissions($pdo, (int) $kitchen['id']);
+
 kl_head('רשימת טפסים');
 kl_topbar();
 kl_context_bar($user, $kitchen);
@@ -41,6 +44,22 @@ kl_context_bar($user, $kitchen);
     <h1>אילו בדיקות נותרו היום?</h1>
     <p>טפסים שמולאו היום ב<?= kl_h($kitchen['name']) ?> מסומנים בירוק.</p>
   </div>
+
+  <?php if ($openDeferred): ?>
+    <div class="section-label">פעולות פתוחות ממתינות להשלמה</div>
+    <div class="card-list" style="margin-bottom:18px;">
+      <?php foreach ($openDeferred as $row): ?>
+        <a class="form-card" href="<?= kl_h(kl_url('complete.php')) ?>?sid=<?= (int) $row['id'] ?>">
+          <span class="form-card__status"></span>
+          <span class="form-card__body">
+            <span class="form-card__title"><?= kl_h($row['form_name']) ?></span>
+            <span class="form-card__meta">נפתח לפני <span data-elapsed-since="<?= kl_h(str_replace(' ', 'T', $row['submitted_at'])) ?>">…</span></span>
+          </span>
+          <span class="form-card__chevron">‹</span>
+        </a>
+      <?php endforeach; ?>
+    </div>
+  <?php endif; ?>
 
   <?php foreach ($grouped as $category => $items): ?>
     <div class="section-label"><?= kl_h($category) ?></div>

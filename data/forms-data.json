@@ -185,7 +185,7 @@
       "fieldKey": "temp_exit",
       "label": "טמפרטורה בהוצאה מהקירור (°C)",
       "fieldType": "number",
-      "required": true,
+      "required": false,
       "orderIndex": 4,
       "options": null
     },
@@ -194,7 +194,7 @@
       "fieldKey": "time_exit",
       "label": "שעת הוצאה",
       "fieldType": "time",
-      "required": true,
+      "required": false,
       "orderIndex": 5,
       "options": null
     },

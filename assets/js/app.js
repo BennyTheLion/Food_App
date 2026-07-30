@@ -96,10 +96,36 @@
     });
   }
 
+  function formatElapsed(ms) {
+    var totalMinutes = Math.floor(ms / 60000);
+    var hours = Math.floor(totalMinutes / 60);
+    var minutes = totalMinutes % 60;
+    if (hours > 0) return hours + ' שעות ו-' + minutes + ' דקות';
+    return minutes + ' דקות';
+  }
+
+  function initElapsedTimers() {
+    var els = document.querySelectorAll('[data-elapsed-since]');
+    if (!els.length) return;
+
+    function tick() {
+      var now = Date.now();
+      els.forEach(function (el) {
+        var since = Date.parse(el.dataset.elapsedSince);
+        if (isNaN(since)) return;
+        el.textContent = formatElapsed(Math.max(0, now - since));
+      });
+    }
+
+    tick();
+    setInterval(tick, 30000);
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     initGauges();
     initDynamicRows();
     initDynamicRowsSerialize();
     initPasswordToggles();
+    initElapsedTimers();
   });
 })();
