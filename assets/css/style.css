@@ -161,6 +161,7 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
   min-height: 48px;
 }
 .field textarea { min-height: 88px; resize: vertical; }
+.field input[aria-invalid=true], .field select[aria-invalid=true], .field textarea[aria-invalid=true] { border-color: var(--danger-600); }
 .field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible, .btn:focus-visible, a:focus-visible {
   outline: 3px solid var(--brass-500); outline-offset: 2px;
 }
@@ -217,8 +218,8 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 /* ---------- Dynamic rows (units/dishes/workers) ---------- */
 .rows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
 .row-item { background: #fff; border: 1px solid var(--steel-200); border-radius: var(--radius-control); padding: 12px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-.row-item input { flex: 1; min-width: 90px; border: 1px solid var(--steel-300); border-radius: 8px; padding: 9px 10px; min-height: 42px; }
-.row-item__remove { flex: none; background: var(--danger-100); color: var(--danger-600); border: none; border-radius: 8px; width: 36px; height: 36px; font-weight: 700; cursor: pointer; }
+.row-item input { flex: 1 1 100%; min-width: 0; border: 1px solid var(--steel-300); border-radius: 8px; padding: 9px 10px; min-height: 42px; }
+.row-item__remove { flex: none; margin-inline-start: auto; background: var(--danger-100); color: var(--danger-600); border: none; border-radius: 8px; width: 36px; height: 36px; font-weight: 700; cursor: pointer; }
 .add-row-btn { align-self: flex-start; }
 
 /* ---------- Sticky submit bar ---------- */
@@ -293,6 +294,7 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 }
 .admin-row__fields { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; flex: 1; min-width: 0; }
 .admin-row__fields input, .admin-row__fields select {
+  flex: 1 1 140px; min-width: 140px;
   border: 1px solid var(--steel-300); border-radius: 8px; padding: 8px 10px; min-height: 38px; font-size: 14px;
 }
 .admin-row__meta { font-size: 13px; color: var(--graphite-600); white-space: nowrap; }
@@ -304,9 +306,9 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
   padding: 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
 }
 .admin-add input, .admin-add select {
+  flex: 1 1 160px; min-width: 160px;
   border: 1px solid var(--steel-300); border-radius: var(--radius-control); padding: 12px 14px; min-height: 48px; font-size: 15px;
 }
-.admin-add input[type=text], .admin-add input[type=email], .admin-add input[type=password] { flex: 1; min-width: 160px; }
 
 /* ---------- Request cards (date-open requests) ---------- */
 .request-card {
@@ -353,6 +355,7 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
   .stat-grid { grid-template-columns: repeat(4, 1fr); }
   .submit-bar { background: transparent; position: static; padding: 24px 0; }
   .submit-bar .btn { width: auto; min-width: 220px; }
+  .row-item input { flex: 1 1 0; min-width: 90px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
