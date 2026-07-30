@@ -348,6 +348,24 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 .badge.danger { background: var(--danger-100); color: var(--danger-600); }
 .badge.neutral { background: var(--steel-100); color: var(--graphite-600); }
 
+/* ---------- Install-to-home-screen suggestion ---------- */
+/* Sits in normal document flow (not fixed) so it can never overlap the
+   sticky bottom submit-bar that some pages have. */
+.install-banner {
+  background: var(--graphite-900); color: var(--steel-50);
+  padding: 12px 16px;
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.install-banner[hidden] { display: none; }
+.install-banner__text { flex: 1; min-width: 200px; font-size: 14px; line-height: 1.4; }
+.install-banner__actions { display: flex; align-items: center; gap: 6px; flex: none; }
+.install-banner .btn-primary { padding: 8px 16px; min-height: 38px; }
+.install-banner__dismiss {
+  background: transparent; border: none; color: var(--steel-50); opacity: 0.75;
+  font-size: 22px; line-height: 1; cursor: pointer; padding: 6px 10px; border-radius: 8px;
+}
+.install-banner__dismiss:hover { opacity: 1; }
+
 /* ---------- Tablet / desktop ---------- */
 @media (min-width: 720px) {
   .container { padding-inline: 24px; }

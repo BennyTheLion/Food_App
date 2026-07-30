@@ -121,11 +121,64 @@
     setInterval(tick, 30000);
   }
 
+  function initInstallPrompt() {
+    var STORAGE_KEY = 'kl_install_dismissed';
+    var banner = document.getElementById('install-banner');
+    if (!banner) return;
+
+    var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    var dismissed = false;
+    try { dismissed = localStorage.getItem(STORAGE_KEY) === '1'; } catch (e) {}
+    if (isStandalone || dismissed) return;
+
+    var textEl = banner.querySelector('.install-banner__text');
+    var actionBtn = banner.querySelector('.install-banner__action');
+    var dismissBtn = banner.querySelector('.install-banner__dismiss');
+
+    function dismiss() {
+      banner.setAttribute('hidden', '');
+      try { localStorage.setItem(STORAGE_KEY, '1'); } catch (e) {}
+    }
+    if (dismissBtn) dismissBtn.addEventListener('click', dismiss);
+
+    var isIOS = (/iphone|ipad|ipod/i.test(navigator.userAgent)
+      || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) && !window.MSStream;
+
+    if (isIOS) {
+      if (textEl) textEl.textContent = 'להוספת האפליקציה למסך הבית: הקש/י על כפתור השיתוף ולאחר מכן על “הוסף למסך הבית”';
+      if (actionBtn) actionBtn.setAttribute('hidden', '');
+      banner.removeAttribute('hidden');
+      return;
+    }
+
+    var deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', function (e) {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (textEl) textEl.textContent = 'ניתן להתקין את האפליקציה במכשיר לגישה מהירה יותר';
+      banner.removeAttribute('hidden');
+    });
+
+    if (actionBtn) {
+      actionBtn.addEventListener('click', function () {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.finally(function () {
+          deferredPrompt = null;
+          dismiss();
+        });
+      });
+    }
+
+    window.addEventListener('appinstalled', dismiss);
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     initGauges();
     initDynamicRows();
     initDynamicRowsSerialize();
     initPasswordToggles();
     initElapsedTimers();
+    initInstallPrompt();
   });
 })();

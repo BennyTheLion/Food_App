@@ -41,8 +41,22 @@ function kl_head(string $title): void
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@500;700;800&family=Assistant:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<?= kl_h(kl_url('assets/css/style.css')) ?>?v=<?= @filemtime(__DIR__ . '/../assets/css/style.css') ?: '1' ?>">
+<link rel="manifest" href="<?= kl_h(kl_url('manifest.json')) ?>">
+<link rel="apple-touch-icon" href="<?= kl_h(kl_url('assets/icons/apple-touch-icon.png')) ?>">
+<link rel="icon" href="<?= kl_h(kl_url('assets/icons/icon-192.png')) ?>">
+<meta name="theme-color" content="#1b242b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ניהול מטבח">
 </head>
 <body>
+<div id="install-banner" class="install-banner" hidden>
+  <span class="install-banner__text"></span>
+  <div class="install-banner__actions">
+    <button type="button" class="btn btn-primary install-banner__action">התקנה</button>
+    <button type="button" class="install-banner__dismiss" aria-label="סגירה">×</button>
+  </div>
+</div>
     <?php
 }
 
