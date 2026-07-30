@@ -258,7 +258,7 @@ kl_context_bar($user, $kitchen);
           <input type="<?= $inputType ?>" id="<?= kl_h($key) ?>" name="<?= kl_h($key) ?>" <?= $required ? 'required' : '' ?>
                  <?php if ($lockToToday): ?>min="<?= $today ?>" max="<?= $today ?>" value="<?= $today ?>"<?php endif; ?>
                  <?php if (isset($errors[$key])): ?>aria-invalid="true"<?php endif; ?>>
-          <?php if (isset($errors[$key]) && $isRestrictedDate): ?>
+          <?php if (isset($errors[$key])): ?>
             <p style="color:var(--danger-600); font-size:13px; margin-top:6px;"><?= kl_h($errors[$key]) ?></p>
           <?php endif; ?>
         </div>
