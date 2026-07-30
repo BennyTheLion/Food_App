@@ -121,56 +121,60 @@
     setInterval(tick, 30000);
   }
 
-  function initInstallPrompt() {
-    var STORAGE_KEY = 'kl_install_dismissed';
-    var banner = document.getElementById('install-banner');
-    if (!banner) return;
+  function initVoiceInput() {
+    var buttons = document.querySelectorAll('.mic-btn');
+    if (!buttons.length) return;
 
-    var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-    var dismissed = false;
-    try { dismissed = localStorage.getItem(STORAGE_KEY) === '1'; } catch (e) {}
-    if (isStandalone || dismissed) return;
-
-    var textEl = banner.querySelector('.install-banner__text');
-    var actionBtn = banner.querySelector('.install-banner__action');
-    var dismissBtn = banner.querySelector('.install-banner__dismiss');
-
-    function dismiss() {
-      banner.setAttribute('hidden', '');
-      try { localStorage.setItem(STORAGE_KEY, '1'); } catch (e) {}
-    }
-    if (dismissBtn) dismissBtn.addEventListener('click', dismiss);
-
-    var isIOS = (/iphone|ipad|ipod/i.test(navigator.userAgent)
-      || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) && !window.MSStream;
-
-    if (isIOS) {
-      if (textEl) textEl.textContent = 'להוספת האפליקציה למסך הבית: הקש/י על כפתור השיתוף ולאחר מכן על “הוסף למסך הבית”';
-      if (actionBtn) actionBtn.setAttribute('hidden', '');
-      banner.removeAttribute('hidden');
+    var SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognitionCtor) {
+      // No browser support (e.g. Safari) -- hide rather than show a dead button.
+      // iOS/iPadOS users still get voice input via the keyboard's own dictation key.
+      buttons.forEach(function (btn) { btn.remove(); });
       return;
     }
 
-    var deferredPrompt = null;
-    window.addEventListener('beforeinstallprompt', function (e) {
-      e.preventDefault();
-      deferredPrompt = e;
-      if (textEl) textEl.textContent = 'ניתן להתקין את האפליקציה במכשיר לגישה מהירה יותר';
-      banner.removeAttribute('hidden');
-    });
+    buttons.forEach(function (btn) {
+      var textarea = document.getElementById(btn.dataset.target);
+      if (!textarea) return;
 
-    if (actionBtn) {
-      actionBtn.addEventListener('click', function () {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.finally(function () {
-          deferredPrompt = null;
-          dismiss();
+      var recognition = null;
+      var listening = false;
+
+      btn.addEventListener('click', function () {
+        if (listening) {
+          if (recognition) recognition.stop();
+          return;
+        }
+
+        recognition = new SpeechRecognitionCtor();
+        recognition.lang = 'he-IL';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.addEventListener('start', function () {
+          listening = true;
+          btn.classList.add('mic-btn--active');
+          btn.setAttribute('aria-label', 'עצירת הקלטה');
         });
-      });
-    }
+        recognition.addEventListener('result', function (e) {
+          var transcript = e.results[0][0].transcript;
+          var sep = textarea.value && !/\s$/.test(textarea.value) ? ' ' : '';
+          textarea.value += sep + transcript;
+        });
+        recognition.addEventListener('end', function () {
+          listening = false;
+          btn.classList.remove('mic-btn--active');
+          btn.setAttribute('aria-label', 'הקלטה קולית');
+        });
+        recognition.addEventListener('error', function () {
+          listening = false;
+          btn.classList.remove('mic-btn--active');
+          btn.setAttribute('aria-label', 'הקלטה קולית');
+        });
 
-    window.addEventListener('appinstalled', dismiss);
+        recognition.start();
+      });
+    });
   }
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -179,6 +183,6 @@
     initDynamicRowsSerialize();
     initPasswordToggles();
     initElapsedTimers();
-    initInstallPrompt();
+    initVoiceInput();
   });
 })();

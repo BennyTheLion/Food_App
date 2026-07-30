@@ -117,7 +117,15 @@ kl_context_bar($user, $kitchen);
       <?php if ($type === 'textarea'): ?>
         <div class="field">
           <label class="field__label" for="<?= kl_h($key) ?>"><?= kl_h($label) ?></label>
-          <textarea id="<?= kl_h($key) ?>" name="<?= kl_h($key) ?>"><?= kl_h($existingValues[$key] ?? '') ?></textarea>
+          <div class="textarea-field">
+            <textarea id="<?= kl_h($key) ?>" name="<?= kl_h($key) ?>"><?= kl_h($existingValues[$key] ?? '') ?></textarea>
+            <button type="button" class="mic-btn" data-target="<?= kl_h($key) ?>" aria-label="הקלטה קולית">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="2" width="6" height="12" rx="3"/>
+                <path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v3"/>
+              </svg>
+            </button>
+          </div>
         </div>
       <?php else: ?>
         <div class="field">

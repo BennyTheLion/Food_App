@@ -161,6 +161,17 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
   min-height: 48px;
 }
 .field textarea { min-height: 88px; resize: vertical; }
+.textarea-field { position: relative; }
+.textarea-field textarea { padding-inline-end: 46px; width: 100%; }
+.mic-btn {
+  position: absolute; inset-inline-end: 4px; top: 4px;
+  background: none; border: none; cursor: pointer; color: var(--graphite-600);
+  padding: 10px; border-radius: 8px; display: flex;
+}
+.mic-btn:hover { color: var(--graphite-900); }
+.mic-btn:focus-visible { outline: 3px solid var(--brass-500); outline-offset: 1px; }
+.mic-btn--active { color: var(--danger-600); animation: mic-pulse 1.2s ease-in-out infinite; }
+@keyframes mic-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
 .field input[aria-invalid=true], .field select[aria-invalid=true], .field textarea[aria-invalid=true] { border-color: var(--danger-600); }
 .field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible, .btn:focus-visible, a:focus-visible {
   outline: 3px solid var(--brass-500); outline-offset: 2px;
@@ -347,24 +358,6 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 .badge.safe { background: var(--safe-100); color: var(--safe-600); }
 .badge.danger { background: var(--danger-100); color: var(--danger-600); }
 .badge.neutral { background: var(--steel-100); color: var(--graphite-600); }
-
-/* ---------- Install-to-home-screen suggestion ---------- */
-/* Sits in normal document flow (not fixed) so it can never overlap the
-   sticky bottom submit-bar that some pages have. */
-.install-banner {
-  background: var(--graphite-900); color: var(--steel-50);
-  padding: 12px 16px;
-  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-}
-.install-banner[hidden] { display: none; }
-.install-banner__text { flex: 1; min-width: 200px; font-size: 14px; line-height: 1.4; }
-.install-banner__actions { display: flex; align-items: center; gap: 6px; flex: none; }
-.install-banner .btn-primary { padding: 8px 16px; min-height: 38px; }
-.install-banner__dismiss {
-  background: transparent; border: none; color: var(--steel-50); opacity: 0.75;
-  font-size: 22px; line-height: 1; cursor: pointer; padding: 6px 10px; border-radius: 8px;
-}
-.install-banner__dismiss:hover { opacity: 1; }
 
 /* ---------- Tablet / desktop ---------- */
 @media (min-width: 720px) {

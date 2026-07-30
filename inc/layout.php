@@ -50,13 +50,6 @@ function kl_head(string $title): void
 <meta name="apple-mobile-web-app-title" content="ניהול מטבח">
 </head>
 <body>
-<div id="install-banner" class="install-banner" hidden>
-  <span class="install-banner__text"></span>
-  <div class="install-banner__actions">
-    <button type="button" class="btn btn-primary install-banner__action">התקנה</button>
-    <button type="button" class="install-banner__dismiss" aria-label="סגירה">×</button>
-  </div>
-</div>
     <?php
 }
 
