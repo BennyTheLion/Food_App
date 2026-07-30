@@ -290,25 +290,50 @@ function kl_migrate_legacy_kitchens(PDO $pdo): void
     }
 
     $columns = array_column($pdo->query('PRAGMA table_info(kitchens)')->fetchAll(PDO::FETCH_ASSOC), 'name');
-    if (in_array('dining_room_id', $columns, true)) {
-        return; // already migrated
+
+    if (!in_array('dining_room_id', $columns, true)) {
+        if (!in_array('site_id', $columns, true)) {
+            return; // unexpected shape, nothing sensible to migrate
+        }
+
+        $pdo->exec('ALTER TABLE kitchens ADD COLUMN dining_room_id INTEGER REFERENCES dining_rooms(id)');
+
+        $siteIds = $pdo->query('SELECT DISTINCT site_id FROM kitchens WHERE site_id IS NOT NULL')->fetchAll(PDO::FETCH_COLUMN);
+        $insertRoom = $pdo->prepare('INSERT INTO dining_rooms (site_id, name, created_at) VALUES (:site_id, :name, :created_at)');
+        $attachKitchens = $pdo->prepare('UPDATE kitchens SET dining_room_id = :room_id WHERE site_id = :site_id AND dining_room_id IS NULL');
+
+        foreach ($siteIds as $siteId) {
+            $insertRoom->execute([
+                ':site_id' => $siteId,
+                ':name' => 'חדר אוכל ראשי',
+                ':created_at' => (new DateTime())->format('Y-m-d H:i:s'),
+            ]);
+            $attachKitchens->execute([':room_id' => $pdo->lastInsertId(), ':site_id' => $siteId]);
+        }
+
+        $columns[] = 'dining_room_id';
     }
-    if (!in_array('site_id', $columns, true)) {
-        return; // unexpected shape, nothing sensible to migrate
-    }
 
-    $pdo->exec('ALTER TABLE kitchens ADD COLUMN dining_room_id INTEGER REFERENCES dining_rooms(id)');
-
-    $siteIds = $pdo->query('SELECT DISTINCT site_id FROM kitchens WHERE site_id IS NOT NULL')->fetchAll(PDO::FETCH_COLUMN);
-    $insertRoom = $pdo->prepare('INSERT INTO dining_rooms (site_id, name, created_at) VALUES (:site_id, :name, :created_at)');
-    $attachKitchens = $pdo->prepare('UPDATE kitchens SET dining_room_id = :room_id WHERE site_id = :site_id AND dining_room_id IS NULL');
-
-    foreach ($siteIds as $siteId) {
-        $insertRoom->execute([
-            ':site_id' => $siteId,
-            ':name' => 'חדר אוכל ראשי',
-            ':created_at' => (new DateTime())->format('Y-m-d H:i:s'),
-        ]);
-        $attachKitchens->execute([':room_id' => $pdo->lastInsertId(), ':site_id' => $siteId]);
+    // The ADD COLUMN step above (whenever it first ran) left the old
+    // `site_id NOT NULL` column sitting in the table — SQLite can't drop or
+    // relax a column constraint via ALTER TABLE, so every kitchen insert
+    // since (which only sets dining_room_id) has been failing that NOT NULL
+    // check. Rebuild the table without it, once every row has been backfilled.
+    if (in_array('site_id', $columns, true)) {
+        $unbackfilled = (int) $pdo->query('SELECT COUNT(*) FROM kitchens WHERE dining_room_id IS NULL')->fetchColumn();
+        if ($unbackfilled === 0) {
+            $pdo->exec('PRAGMA foreign_keys = OFF');
+            $pdo->exec('CREATE TABLE kitchens_rebuild (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                dining_room_id INTEGER NOT NULL REFERENCES dining_rooms(id),
+                name TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            )');
+            $pdo->exec('INSERT INTO kitchens_rebuild (id, dining_room_id, name, created_at)
+                        SELECT id, dining_room_id, name, created_at FROM kitchens');
+            $pdo->exec('DROP TABLE kitchens');
+            $pdo->exec('ALTER TABLE kitchens_rebuild RENAME TO kitchens');
+            $pdo->exec('PRAGMA foreign_keys = ON');
+        }
     }
 }
