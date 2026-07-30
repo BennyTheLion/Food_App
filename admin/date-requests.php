@@ -58,7 +58,7 @@ $statusClass = ['pending' => 'neutral', 'approved' => 'safe', 'denied' => 'dange
           <strong><?= kl_h($r['requested_by_name']) ?> מבקש/ת <?= kl_h($r['requested_date']) ?></strong>
           <div class="form-card__meta">
             <span class="badge <?= $statusClass[$r['status']] ?>"><?= $statusLabel[$r['status']] ?></span>
-            <?= kl_h($r['form_name']) ?> · <?= kl_h($r['site_name']) ?> — <?= kl_h($r['room_name']) ?> — <?= kl_h($r['kitchen_name']) ?>
+            <?= kl_h($r['form_name']) ?> · <?= kl_location_breadcrumb($r['site_name'], $r['room_name'], $r['kitchen_name']) ?>
           </div>
           <div class="form-card__meta"><?= kl_h($r['reason']) ?></div>
         </div>

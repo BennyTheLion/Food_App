@@ -38,7 +38,7 @@ kl_context_bar($user);
           <tr>
             <td><?= kl_h($s['form_name']) ?></td>
             <td><?= kl_h($s['filler_name']) ?></td>
-            <td><?= kl_h($s['site_name']) ?> — <?= kl_h($s['room_name']) ?> — <?= kl_h($s['kitchen_name']) ?></td>
+            <td><?= kl_location_breadcrumb($s['site_name'], $s['room_name'], $s['kitchen_name']) ?></td>
             <td class="mono"><?= kl_h($s['submitted_at']) ?></td>
             <td><a href="<?= kl_h(kl_url('submission.php')) ?>?id=<?= (int) $s['id'] ?>">פרטים ‹</a></td>
           </tr>

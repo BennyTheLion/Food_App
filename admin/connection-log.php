@@ -31,7 +31,7 @@ kl_context_bar($user);
         <?php foreach ($log as $entry): ?>
           <tr>
             <td><?= kl_h($entry['user_name']) ?></td>
-            <td><?= kl_h($entry['site_name']) ?> — <?= kl_h($entry['room_name']) ?> — <?= kl_h($entry['kitchen_name']) ?></td>
+            <td><?= kl_location_breadcrumb($entry['site_name'], $entry['room_name'], $entry['kitchen_name']) ?></td>
             <td class="mono"><?= kl_h($entry['connected_at']) ?></td>
             <td class="mono">
               <?php if ($entry['disconnected_at']): ?>

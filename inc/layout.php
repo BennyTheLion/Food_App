@@ -25,6 +25,19 @@ function kl_url(string $path): string
     return kl_base_path() . '/' . ltrim($path, '/');
 }
 
+/** "site — room — kitchen" breadcrumb, collapsing adjacent parts that are named the same (e.g. a kitchen literally named the same as its dining room) so nothing repeats. */
+function kl_location_breadcrumb(string $site, string $room, string $kitchen): string
+{
+    $parts = [$site];
+    if ($room !== end($parts)) {
+        $parts[] = $room;
+    }
+    if ($kitchen !== end($parts)) {
+        $parts[] = $kitchen;
+    }
+    return implode(' — ', array_map('kl_h', $parts));
+}
+
 function kl_head(string $title): void
 {
     if (!headers_sent()) {
@@ -75,7 +88,7 @@ function kl_context_bar(array $user, ?array $kitchen = null): void
   <div class="station-bar__row">
     <span>שלום, <?= kl_h($user['name']) ?><?= kl_is_admin($user) ? ' (מנהל)' : '' ?></span>
     <?php if ($kitchen): ?>
-      <span>· <?= kl_h($kitchen['site_name']) ?> — <?= kl_h($kitchen['dining_room_name']) ?> — <?= kl_h($kitchen['name']) ?></span>
+      <span>· <?= kl_location_breadcrumb($kitchen['site_name'], $kitchen['dining_room_name'], $kitchen['name']) ?></span>
       <a href="<?= kl_h(kl_url('select-site.php')) ?>">יציאה מהמטבח</a>
     <?php endif; ?>
     <a href="<?= kl_h(kl_url('logout.php')) ?>" style="margin-inline-start:auto;">התנתקות</a>

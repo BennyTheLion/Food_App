@@ -35,7 +35,7 @@ kl_context_bar($user);
         <span class="admin-row__fields">
           <strong><?= kl_h($l['user_name']) ?></strong>
           <span class="admin-row__meta">
-            <?= kl_h($l['site_name']) ?> — <?= kl_h($l['room_name']) ?> — <?= kl_h($l['kitchen_name']) ?>
+            <?= kl_location_breadcrumb($l['site_name'], $l['room_name'], $l['kitchen_name']) ?>
             · מחובר/ת מאז <?= kl_h($l['locked_at']) ?>
           </span>
         </span>
